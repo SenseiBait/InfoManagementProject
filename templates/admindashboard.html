@@ -3,141 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Dashboard - UNIDA CHRISTIAN COLLEGES</title>
-  <style>
-    :root {
-      --dark-green: #1E4D2B;
-      --green: #145c34;
-      --gold: #FFD700;
-      --white: #ffffff;
-      --off-white: #fdfdfd;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background-color: var(--off-white);
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      width: 260px;
-      background-color: var(--dark-green);
-      color: var(--white);
-      padding: 25px;
-    }
-
-    .sidebar h2 {
-      color: var(--gold);
-      margin-bottom: 15px;
-      font-size: 1.2em;
-    }
-
-    .sidebar ul {
-      list-style: none;
-      margin-bottom: 30px;
-    }
-
-    .sidebar li {
-      border-left: 3px solid transparent;
-      margin-bottom: 5px;
-    }
-
-    .sidebar a {
-      text-decoration: none;
-      color: var(--white);
-      display: block;
-      padding: 10px 12px;
-    }
-
-    .sidebar li:hover {
-      background-color: var(--green);
-      border-left: 3px solid var(--gold);
-    }
-
-    .content {
-      flex: 1;
-      padding: 40px;
-    }
-
-    .content h1 {
-      color: var(--dark-green);
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background-color: var(--white);
-      border: 2px solid var(--gold);
-      border-radius: 10px;
-      padding: 25px;
-      margin-bottom: 20px;
-    }
-
-    .card h3 {
-      color: var(--green);
-      margin-bottom: 10px;
-    }
-
-    .card p {
-      color: var(--dark-green);
-      line-height: 1.6;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid var(--green);
-      text-align: left;
-    }
-
-    th {
-      background-color: var(--dark-green);
-      color: var(--gold);
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
 
-  <div class="sidebar">
-    <h2><a href="/admindashboard" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
-
-    <h2>Admin Options</h2>
-    <ul>
-      <li><a href="/viewstudents">View Students</a></li>
-      <li><a href="/viewcourses">View Courses</a></li>
-    </ul>
+  <!-- Banner -->
+  <div class="school-banner">
+    <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+    <h1>UNIDA CHRISTIAN COLLEGES</h1>
   </div>
 
-  <div class="content">
-    <h1>Admin Dashboard</h1>
+  <!-- Main container (Sidebar + Content) -->
+  <div class="main-container">
 
-    <div class="card">
-      <h3>Welcome, Admin!</h3>
-      <p>
-        Here you can manage student records, view courses, and monitor
-        enrollment and performance. Use the sidebar to navigate through
-        your admin options.
-      </p>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2><a href="/admindashboard" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+
+      <h2>Admin Options</h2>
+      <ul>
+        <li><a href="/viewstudents">View Students</a></li>
+        <li><a href="/viewcourses">View Courses</a></li>
+      </ul>
     </div>
 
-    <div class="card">
-      <h3>Quick Stats</h3>
-      <p>
-        You can add tables here later to show total students, total courses,
-        or other admin-related information.
-      </p>
+    <!-- Content -->
+    <div class="content">
+      <h1>Admin Dashboard</h1>
+
+      <div class="card">
+        <h3>Welcome, Admin!</h3>
+        <p>
+          Here you can manage student records, view courses, and monitor
+          enrollment and performance. Use the sidebar to navigate through
+          your admin options.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Quick Stats</h3>
+        <p>
+          You can add tables here later to show total students, total courses,
+          or other admin-related information.
+        </p>
+      </div>
     </div>
-  </div>
+
+  </div> <!-- End of main-container -->
 
 </body>
 </html>
