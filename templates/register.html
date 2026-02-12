@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+:root {
+  --dark-green: #1E4D2B;
+  --green: #145c34;
+  --gold: #FFD700;
+  --white: #ffffff;
+  --off-white: #fdfdfd;
+}
+
+body {
+  background: linear-gradient(90deg, var(--dark-green) 0%, var(--green) 100%);
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.register-container {
+  width: 400px;
+  margin: 50px auto;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.register-header h1 {
+  color: var(--gold);
+  margin-bottom: 5px;
+}
+
+.register-header span {
+  color: var(--white);
+  font-size: 14px;
+}
+
+.register-card {
+  background-color: var(--white);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+/* FLOATING LABEL INPUTS */
+.input-container {
+  position: relative;
+  width: 90%;
+  margin: 0 auto 20px;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 15px 10px 15px 10px;
+  border: 1px solid var(--green);
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  background: none;
+}
+
+.input-container label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 14px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.input-container input:focus + label,
+.input-container input:not(:placeholder-shown) + label {
+  top: 0px; /* Adjust the floating label height here */
+  font-size: 12px;
+  color: var(--dark-green);
+  background: var(--white);
+  padding: 0 4px;
+}
+
+/* BUTTON */
+.register-card button {
+  display: block;
+  width: 90%;
+  margin: 0 auto;
+  padding: 15px;
+  background-color: var(--dark-green);
+  color: var(--gold);
+  border: 0;
+  border-radius: 5px;
+  font-size: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.register-card button:hover {
+  background-color: var(--green);
+}
+
+.register-card .message {
+  margin-top: 15px;
+  font-size: 12px;
+  color: var(--dark-green);
+}
+
+.register-card .message a {
+  color: var(--gold);
+  text-decoration: none;
+}
+</style>
+
+<div class="register-container">
+  <div class="register-header">
+    <h1>UNIDA CHRISTIAN COLLEGES</h1>
+    <span>Create your account</span>
+  </div>
+
+  <div class="register-card">
+    <form method="POST">
+      <div class="input-container">
+        <input type="text" name="firstname" placeholder=" " required>
+        <label>First Name</label>
+      </div>
+
+      <div class="input-container">
+        <input type="text" name="lastname" placeholder=" " required>
+        <label>Last Name</label>
+      </div>
+
+      <div class="input-container">
+        <input type="email" name="email" placeholder=" " required>
+        <label>Email</label>
+      </div>
+
+      <div class="input-container">
+        <input type="text" name="yearlevel" placeholder=" " required>
+        <label>Year Level</label>
+      </div>
+
+      <div class="input-container">
+        <input type="text" name="major" placeholder=" " required>
+        <label>Major</label>
+      </div>
+
+      <div class="input-container">
+        <input type="password" name="password" placeholder=" " required>
+        <label>Password</label>
+      </div>
+
+      <button type="submit">Register</button>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <p class="message">{{ messages[0] }}</p>
+        {% endif %}
+      {% endwith %}
+
+      <p class="message">Already have an account? <a href="/login">Login</a></p>
+    </form>
+  </div>
+</div>
+{% endblock %}
