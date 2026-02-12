@@ -75,31 +75,64 @@ def admindashboard():
         return redirect(url_for('main'))
     return render_template('admindashboard.html')
 
-@app.route('/viewstudents')
-@login_required
-def viewstudents():
-    if current_user.role != 'admin':
-        flash("Access denied")
-        return redirect(url_for('main'))
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT StudentID, FirstName, LastName, Email, Major FROM Students")
-    students = cursor.fetchall()
-    conn.close()
-    return render_template('admin_viewstudents.html', students=students)
+#---------------------------------------------------
 
-@app.route('/viewcourses')
+@app.route('/viewcourses', methods=['GET', 'POST'])
 @login_required
 def viewcourses():
-    if current_user.role != 'admin':
-        flash("Access denied")
-        return redirect(url_for('main'))
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT CourseID, CourseName, Credits FROM Courses")
-    courses = cursor.fetchall()
+
+    # Courses list
+    courses = [
+        "BEED (Generalists)",
+        "BSED MAJOR SOCIAL STUDIES",
+        "BSED MAJOR VALUES",
+        "BSED MAJOR ENGLISH",
+        "BSBA HR MANAGEMENT",
+        "BSBA OP MAN",
+        "BSCS",
+        "ACT SPECIAL MMA"
+    ]
+
+    selected_course = ""
+    selected_year = ""
+    search_query = ""
+    students = []
+
+    if request.method == 'POST':
+        selected_course = request.form.get('course', '')
+        selected_year = request.form.get('year', '')
+        search_query = request.form.get('search', '')
+
+        # Only query if at least one filter is applied
+        if selected_course or selected_year or search_query:
+            query = "SELECT FirstName, LastName, Email, Major, YearLevel FROM Students WHERE 1=1"
+            params = []
+
+            if selected_course:
+                query += " AND Major = ?"
+                params.append(selected_course)
+
+            if selected_year:
+                query += " AND YearLevel = ?"
+                params.append(selected_year)
+
+            if search_query:
+                query += " AND (FirstName LIKE ? OR LastName LIKE ? OR Email LIKE ?)"
+                search_term = f"%{search_query}%"
+                params.extend([search_term, search_term, search_term])
+
+            cursor.execute(query, params)
+            students = cursor.fetchall()
+
     conn.close()
-    return render_template('admin_viewcourses.html', courses=courses)
+    return render_template('subpages/viewcourses.html',
+                           courses=courses,
+                           students=students,
+                           selected_course=selected_course,
+                           selected_year=selected_year,
+                           search_query=search_query)
 
 # ----------------- LOGOUT -----------------
 @app.route('/logout')

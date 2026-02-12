@@ -13,28 +13,43 @@
   font-family: Arial, sans-serif;
 }
 
-/* Banner */
 .school-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--dark-green);
-  color: var(--gold);
-  padding: 10px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the school name */
+    background-color: #1E4D2B;
+    color: #FFD700;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    position: relative; /* for absolute positioning of user-info */
 }
 
 .school-banner img {
-  height: 50px;
-  margin-right: 15px;
+    height: 50px;
+    margin-right: 15px;
 }
 
 .school-banner h1 {
-  font-size: 1.5rem;
-  text-align: center;
-  margin: 0;
+    font-size: 1.5rem;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+/* User info on the right */
+.school-banner .user-info {
+    position: absolute;
+    right: 20px;
+    font-size: 0.9rem;
+    color: #FFD700;
+}
+
+.school-banner .user-info a {
+    color: #FFD700;
+    text-decoration: underline;
+    margin-left: 5px;
 }
 
 /* Main container */
