@@ -107,7 +107,7 @@ def viewcourses():
 
         # Only query if at least one filter is applied
         if selected_course or selected_year or search_query:
-            query = "SELECT FirstName, LastName, Email, Major, YearLevel FROM Students WHERE 1=1"
+            query = "SELECT FirstName, LastName, Email, Major, YearLevel FROM BSCSStudents WHERE 1=1"
             params = []
 
             if selected_course:
@@ -162,12 +162,6 @@ def register():
         )
         conn.commit()
 
-        # Optional: also insert into Students table
-        cursor.execute(
-            "INSERT INTO Students (FirstName, LastName, Email, Major) VALUES (?, ?, ?, ?)",
-            (firstname, lastname, email, major)
-        )
-        conn.commit()
         conn.close()
 
         flash('Registration successful! You can now log in.')

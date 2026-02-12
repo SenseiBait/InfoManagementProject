@@ -108,21 +108,40 @@
   margin-bottom: 20px;
 }
 
-/* Cards */
+/* Card spacing */
 .card {
-  background-color: var(--white);
-  border: 2px solid var(--gold);
-  border-radius: 10px;
-  padding: 25px;
-  margin-bottom: 20px;
+    background-color: var(--white);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;  /* more space between cards */
 }
 
-.card h3 {
-  color: var(--green);
-  margin-bottom: 10px;
+/* Table styling inside cards */
+.card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
 }
 
-.card p {
-  color: var(--dark-green);
-  line-height: 1.6;
+.card table th,
+.card table td {
+    border: 1px solid var(--gold);
+    padding: 12px;  /* more space inside each cell */
+    text-align: left;
+}
+
+.card table th {
+    background-color: var(--dark-green);
+    color: var(--gold);
+}
+
+.card table tr:nth-child(even) {
+    background-color: #f9f9f9;  /* alternate row color */
+}
+
+/* Optional: responsive table scroll */
+.card table {
+    display: block;
+    overflow-x: auto;
 }
