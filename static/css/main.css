@@ -13,28 +13,43 @@
   font-family: Arial, sans-serif;
 }
 
-/* Banner */
 .school-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--dark-green);
-  color: var(--gold);
-  padding: 10px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the school name */
+    background-color: #1E4D2B;
+    color: #FFD700;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    position: relative; /* for absolute positioning of user-info */
 }
 
 .school-banner img {
-  height: 50px;
-  margin-right: 15px;
+    height: 50px;
+    margin-right: 15px;
 }
 
 .school-banner h1 {
-  font-size: 1.5rem;
-  text-align: center;
-  margin: 0;
+    font-size: 1.5rem;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+/* User info on the right */
+.school-banner .user-info {
+    position: absolute;
+    right: 20px;
+    font-size: 0.9rem;
+    color: #FFD700;
+}
+
+.school-banner .user-info a {
+    color: #FFD700;
+    text-decoration: underline;
+    margin-left: 5px;
 }
 
 /* Main container */
@@ -93,21 +108,78 @@
   margin-bottom: 20px;
 }
 
-/* Cards */
+/* Card spacing */
 .card {
-  background-color: var(--white);
-  border: 2px solid var(--gold);
-  border-radius: 10px;
-  padding: 25px;
+    background-color: var(--white);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;  /* more space between cards */
+}
+
+/* Table styling inside cards */
+.card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.card table th,
+.card table td {
+    border: 1px solid var(--gold);
+    padding: 12px;  /* more space inside each cell */
+    text-align: left;
+}
+
+.card table th {
+    background-color: var(--dark-green);
+    color: var(--gold);
+}
+
+.card table tr:nth-child(even) {
+    background-color: #f9f9f9;  /* alternate row color */
+}
+
+/* Optional: responsive table scroll */
+.card table {
+    display: block;
+    overflow-x: auto;
+}
+
+    .center-checkbox {
+      text-align: center;
+    }
+    .center-checkbox input[type="checkbox"] {
+      margin: auto;
+      display: block;
+    }
+
+    /* Card styling */
+.card {
+  background-color: #f9f9f9;
+  padding: 20px;
   margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
-.card h3 {
-  color: var(--green);
-  margin-bottom: 10px;
+/* Row for each piece of info */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
 }
 
-.card p {
-  color: var(--dark-green);
-  line-height: 1.6;
+/* Labels and values */
+.info-label {
+  font-weight: bold;
+  width: 200px;  /* Fixed width for labels */
+  text-align: right;
+  padding-right: 15px;
+}
+
+.info-value {
+  flex: 1;
+  padding-left: 15px;
 }

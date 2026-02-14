@@ -11,43 +11,142 @@
 <div class="school-banner">
   <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
   <h1>UNIDA CHRISTIAN COLLEGES</h1>
-
-  <!-- User info on the right -->
   {% if current_user.is_authenticated %}
-  <div class="user-info">
-    {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
-  </div>
+    <div class="user-info">
+      {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
   {% endif %}
 </div>
 
-  <!-- Main container (Sidebar + Content) -->
-  <div class="main-container">
-    <div class="sidebar">
-      <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+<!-- Main container (Sidebar + Content) -->
+<div class="main-container">
+  <div class="sidebar">
+    <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
 
-      <h2>Student Information</h2>
-      <ul>
-        <li><a href="/studentinfo" class="active">Student Information</a></li>
-        <li><a href="/schoolhistory">School History</a></li>
-        <li><a href="/form137">Grade History (Form 137)</a></li>
-      </ul>
+    <h2>Student Information</h2>
+    <ul>
+      <li><a href="/studentinfo" class="active">Student Information</a></li>
+      <li><a href="/schoolhistory">School History</a></li>
+      <li><a href="/form137">Grade History (Form 137)</a></li>
+    </ul>
 
-      <h2>Academic Performance</h2>
-      <ul>
-        <li><a href="/curriculum">Curriculum</a></li>
-        <li><a href="/grades">Grades</a></li>
-        <li><a href="/courses">Enrolled Courses</a></li>
-      </ul>
+    <h2>Academic Performance</h2>
+    <ul>
+      <li><a href="/curriculum">Curriculum</a></li>
+      <li><a href="/grades">Grades</a></li>
+      <li><a href="/courses">Enrolled Courses</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    <!-- Student Information Card -->
+    <div class="card">
+      <h3>Student Information</h3>
+      <div class="info-row">
+        <div class="info-label">First Name:</div>
+        <div class="info-value">{{ student_data['personal'][0] }}</div>
+        <div class="info-label">Last Name:</div>
+        <div class="info-value">{{ student_data['personal'][1] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Program:</div>
+        <div class="info-value">{{ student_data['personal'][2] }}</div>
+        <div class="info-label">Year Level:</div>
+        <div class="info-value">{{ student_data['personal'][3] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Semester:</div>
+        <div class="info-value">{{ student_data['personal'][4] }}</div>
+        <div class="info-label">Status:</div>
+        <div class="info-value">{{ student_data['personal'][5] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Student Number:</div>
+        <div class="info-value">{{ student_data['personal'][6] }}</div>
+        <div class="info-label">Birthday:</div>
+        <div class="info-value">{{ student_data['personal'][7] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Age:</div>
+        <div class="info-value">{{ student_data['personal'][8] }}</div>
+        <div class="info-label">Birthplace:</div>
+        <div class="info-value">{{ student_data['personal'][9] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Sex:</div>
+        <div class="info-value">{{ student_data['personal'][10] }}</div>
+        <div class="info-label">Cellphone Number:</div>
+        <div class="info-value">{{ student_data['personal'][11] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Email:</div>
+        <div class="info-value">{{ student_data['personal'][12] }}</div>
+        <div class="info-label">Civil Status:</div>
+        <div class="info-value">{{ student_data['personal'][13] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Nationality:</div>
+        <div class="info-value">{{ student_data['personal'][14] }}</div>
+        <div class="info-label">Religion:</div>
+        <div class="info-value">{{ student_data['personal'][15] }}</div>
+      </div>
     </div>
 
-    <div class="content">
-      <!-- Editable cards -->
-      <div class="card">
-        <h3>Student Information</h3>
-        <p>Here you can display all the details of the student. Edit this card for content specific to this page.</p>
+    <!-- Permanent Address Card -->
+    <div class="card">
+      <h3>Permanent Address</h3>
+      <div class="info-row">
+        <div class="info-label">House Number:</div>
+        <div class="info-value">{{ student_data['address'][0] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Street:</div>
+        <div class="info-value">{{ student_data['address'][1] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Barangay:</div>
+        <div class="info-value">{{ student_data['address'][2] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">City:</div>
+        <div class="info-value">{{ student_data['address'][3] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Province:</div>
+        <div class="info-value">{{ student_data['address'][4] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">ZIP Code:</div>
+        <div class="info-value">{{ student_data['address'][5] }}</div>
+      </div>
+    </div>
+
+    <!-- Emergency Contact Card -->
+    <div class="card">
+      <h3>Emergency Contact</h3>
+      <div class="info-row">
+        <div class="info-label">Telephone/Mobile Number:</div>
+        <div class="info-value">{{ student_data['emergency'][0] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Contact Person:</div>
+        <div class="info-value">{{ student_data['emergency'][1] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Relation:</div>
+        <div class="info-value">{{ student_data['emergency'][2] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Contact Number:</div>
+        <div class="info-value">{{ student_data['emergency'][3] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Address:</div>
+        <div class="info-value">{{ student_data['emergency'][4] }}</div>
       </div>
     </div>
   </div>
+</div>
 
 </body>
 </html>

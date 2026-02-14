@@ -1,6 +1,6 @@
+import pyodbc
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-import pyodbc
 import bcrypt
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ login_manager.login_view = 'login'
 
 # Database connection function
 def get_db_connection():
-    conn_str = r'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:\Users\Sean Herrera\Desktop\Info Management Project\CollegeStudents.accdb;'
+    conn_str = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:\Users\Sean Herrera\Desktop\Info Management Project\CollegeStudents.accdb;'
     return pyodbc.connect(conn_str)
 
 # User class for Flask-Login
@@ -34,7 +34,8 @@ def load_user(user_id):
         return User(user[0], user[1], user[2])
     return None
 
-# Routes
+# ----------------- ROUTES -----------------
+
 @app.route('/')
 def home():
     return redirect(url_for('login'))
@@ -53,7 +54,6 @@ def login():
 
         if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
             login_user(User(user[0], user[1], user[3]))
-            # Redirect based on role
             if user[3] == 'admin':
                 return redirect(url_for('admindashboard'))
             else:
@@ -66,7 +66,6 @@ def login():
 def main():
     return render_template('main.html')
 
-# ----------------- ADMIN ROUTES -----------------
 @app.route('/admindashboard')
 @login_required
 def admindashboard():
@@ -75,40 +74,82 @@ def admindashboard():
         return redirect(url_for('main'))
     return render_template('admindashboard.html')
 
-@app.route('/viewstudents')
+# ----------------- CURRICULUM ROUTE -----------------
+@app.route('/courses')
 @login_required
-def viewstudents():
-    if current_user.role != 'admin':
-        flash("Access denied")
-        return redirect(url_for('main'))
+def courses():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT StudentID, FirstName, LastName, Email, Major FROM Students")
-    students = cursor.fetchall()
-    conn.close()
-    return render_template('admin_viewstudents.html', students=students)
 
-@app.route('/viewcourses')
-@login_required
-def viewcourses():
-    if current_user.role != 'admin':
-        flash("Access denied")
-        return redirect(url_for('main'))
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT CourseID, CourseName, Credits FROM Courses")
-    courses = cursor.fetchall()
-    conn.close()
-    return render_template('admin_viewcourses.html', courses=courses)
+    courses_data = []
 
-# ----------------- LOGOUT -----------------
+    try:
+        # Step 1: Get the logged-in student's Program, YearLevel, Semester
+        cursor.execute("SELECT Program, YearLevel, Semester FROM BSCSStudents WHERE Email = ?", (current_user.email,))
+        student = cursor.fetchone()
+        print("DEBUG: Student lookup:", student)
+
+        if student:
+            program, year, semester = student
+            table_map = {
+                (1, 1): "BSCS_1_1",
+                (1, 2): "BSCS_1_2",
+                (2, 1): "BSCS_2_1",
+                (2, 2): "BSCS_2_2",
+                (3, 1): "BSCS_3_1",
+                (3, 2): "BSCS_3_2",
+                (4, 1): "BSCS_4_1",
+                (4, 2): "BSCS_4_2"
+            }
+            table_name = table_map.get((year, semester))
+            print("DEBUG: Selected table =", table_name)
+
+            if table_name:
+                # Step 2: Query enrolled courses with new columns
+                query = f"""
+                    SELECT cr.CourseCode,
+                           cr.CourseName,
+                           cr.Credits,
+                           y.YearName AS YearLevel,
+                           s.SemesterName AS Semester,
+                           cur.Grades,
+                           cur.Remarks,
+                           cur.Instructor
+                    FROM (([{table_name}] AS cur
+                    INNER JOIN Courses AS cr ON cur.CourseID = cr.CourseID)
+                    INNER JOIN YearLevels AS y ON cur.YearID = y.YearID)
+                    INNER JOIN Semesters AS s ON cur.SemesterID = s.SemesterID;
+                """
+                print("DEBUG: Executing query:\n", query)
+
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                print("DEBUG: Joined rows:", rows)
+
+                if rows:
+                    columns = [col[0] for col in cursor.description]
+                    courses_data = [dict(zip(columns, row)) for row in rows]
+                    print("DEBUG: Courses rows fetched:", len(courses_data))
+                else:
+                    print("DEBUG: No rows returned from join")
+
+    except pyodbc.Error as e:
+        print("Error executing query:", e)
+        courses_data = []
+
+    conn.close()
+    return render_template('subpages/courses.html', courses=courses_data)
+
+#------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# ----------------- REGISTER -----------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -118,7 +159,6 @@ def register():
         major = request.form['major']
         password = bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-        # By default, new users are 'student'
         role = 'student'
 
         conn = get_db_connection()
@@ -128,13 +168,6 @@ def register():
             (email, password, role)
         )
         conn.commit()
-
-        # Optional: also insert into Students table
-        cursor.execute(
-            "INSERT INTO Students (FirstName, LastName, Email, Major) VALUES (?, ?, ?, ?)",
-            (firstname, lastname, email, major)
-        )
-        conn.commit()
         conn.close()
 
         flash('Registration successful! You can now log in.')
@@ -142,10 +175,136 @@ def register():
 
     return render_template('register.html')
 
+@app.route('/viewcourses', methods=['GET', 'POST'])
+@login_required
+def viewcourses():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    courses = [
+        "BEED (Generalists)",
+        "BSED MAJOR SOCIAL STUDIES",
+        "BSED MAJOR VALUES",
+        "BSED MAJOR ENGLISH",
+        "BSBA HR MANAGEMENT",
+        "BSBA OP MAN",
+        "BSCS",
+        "ACT SPECIAL MMA"
+    ]
+
+    selected_course = ""
+    selected_year = ""
+    search_query = ""
+    students = []
+
+    if request.method == 'POST':
+        selected_course = request.form.get('course', '')
+        selected_year = request.form.get('year', '')
+        search_query = request.form.get('search', '')
+
+        if selected_course or selected_year or search_query:
+            query = "SELECT FirstName, LastName, Email, Major, YearLevel FROM BSCSStudents WHERE 1=1"
+            params = []
+
+            if selected_course:
+                query += " AND Major = ?"
+                params.append(selected_course)
+
+            if selected_year:
+                query += " AND YearLevel = ?"
+                params.append(selected_year)
+
+            if search_query:
+                query += " AND (FirstName LIKE ? OR LastName LIKE ? OR Email LIKE ?)"
+                search_term = f"%{search_query}%"
+                params.extend([search_term, search_term, search_term])
+
+            cursor.execute(query, params)
+            students = cursor.fetchall()
+
+    conn.close()
+    return render_template('subpages/viewcourses.html',
+                           courses=courses,
+                           students=students,
+                           selected_course=selected_course,
+                           selected_year=selected_year,
+                           search_query=search_query)
+
+#------------------------------------------------------------------------------------
+
 @app.route('/studentinfo')
 @login_required
 def studentinfo():
-    return render_template('subpages/studentinfo.html')
+    # Establish the connection to your Access database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Fetch student information (personal, address, and emergency contact data)
+    student_data = {}
+    try:
+        # Fetch personal information
+        query = """
+            SELECT 
+                FirstName, 
+                LastName, 
+                Program, 
+                YearLevel, 
+                Semester, 
+                Status, 
+                StudentNumber, 
+                Birthday, 
+                Age, 
+                Birthplace, 
+                Sex, 
+                CellphoneNumber, 
+                Email, 
+                CivilStatus, 
+                Nationality, 
+                Religion
+            FROM Students
+            WHERE StudentID = ?
+        """
+        cursor.execute(query, (current_user.id,))
+        student_data['personal'] = cursor.fetchone()
+
+        # Fetch permanent address
+        query = """
+            SELECT 
+                HouseNumber, 
+                Street, 
+                Barangay, 
+                City, 
+                Province, 
+                ZipCode
+            FROM PermanentAddress
+            WHERE StudentID = ?
+        """
+        cursor.execute(query, (current_user.id,))
+        student_data['address'] = cursor.fetchone()
+
+        # Fetch emergency contact
+        query = """
+            SELECT 
+                ContactNumber, 
+                ContactPerson, 
+                Relation, 
+                ContactAddress 
+            FROM EmergencyContact
+            WHERE StudentID = ?
+        """
+        cursor.execute(query, (current_user.id,))
+        student_data['emergency'] = cursor.fetchone()
+
+    except pyodbc.Error as e:
+        print(f"Error executing query: {e}")
+        student_data = None  # Handle error gracefully
+
+    finally:
+        conn.close()
+
+    return render_template('subpages/studentinfo.html', student_data=student_data)
+
+#------------------------------------------------------------------------------------
 
 @app.route('/schoolhistory')
 @login_required
@@ -157,21 +316,78 @@ def schoolhistory():
 def form137():
     return render_template('subpages/form137.html')
 
-@app.route('/courses')
-@login_required
-def courses():
-    return render_template('subpages/courses.html')
-
+#------------------------------------------------------------------------------------
 @app.route('/curriculum')
 @login_required
 def curriculum():
-    return render_template('subpages/curriculum.html')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    curriculum_data = {}
+
+    try:
+        cursor.execute("SELECT Program FROM BSCSStudents WHERE Email = ?", (current_user.email,))
+        student = cursor.fetchone()
+
+        if student:
+            program = student[0]
+
+            program_tables = [
+                ("1st Year - 1st Semester", "BSCS_1_1"),
+                ("1st Year - 2nd Semester", "BSCS_1_2"),
+                ("2nd Year - 1st Semester", "BSCS_2_1"),
+                ("2nd Year - 2nd Semester", "BSCS_2_2"),
+                ("3rd Year - 1st Semester", "BSCS_3_1"),
+                ("3rd Year - 2nd Semester", "BSCS_3_2"),
+                ("4th Year - 1st Semester", "BSCS_4_1"),
+                ("4th Year - 2nd Semester", "BSCS_4_2")
+            ]
+
+            for year_sem, table_name in program_tables:
+                query = f"""
+                    SELECT cr.CourseCode,
+                           cr.CourseName,
+                           cr.Credits,
+                           cur.Grades,
+                           cur.Remarks,
+                           cur.Instructor
+                    FROM ([{table_name}] AS cur
+                    INNER JOIN Courses AS cr ON cur.CourseID = cr.CourseID);
+                """
+                cursor.execute(query)
+                rows = cursor.fetchall()
+
+                if rows:
+                    columns = [col[0] for col in cursor.description]
+                    curriculum_data[year_sem] = [dict(zip(columns, row)) for row in rows]
+
+    except pyodbc.Error as e:
+        print("Error executing query:", e)
+        curriculum_data = {}
+
+    conn.close()
+    return render_template('subpages/curriculum.html', curriculum=curriculum_data)
+
+
+# ✅ Placeholder route for checkbox form submission
+@app.route('/update_curriculum', methods=['POST'])
+@login_required
+def update_curriculum():
+    if not current_user.is_admin:
+        return "Unauthorized", 403
+
+    selected_courses = request.form.getlist('selected_courses')
+    print("DEBUG: Selected courses:", selected_courses)
+
+    # Placeholder: you can add DB update logic here later
+    return redirect(url_for('curriculum'))
+
+#------------------------------------------------------------------------------------
 
 @app.route('/grades')
 @login_required
 def grades():
     return render_template('subpages/grades.html')
-
 
 if __name__ == '__main__':
     app.run(debug=True)
