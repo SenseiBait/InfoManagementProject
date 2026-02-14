@@ -2,6 +2,8 @@ import pyodbc
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import bcrypt
+import datetime
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change to a random string for security
@@ -80,12 +82,11 @@ def admindashboard():
 def courses():
     conn = get_db_connection()
     cursor = conn.cursor()
-
     courses_data = []
 
     try:
         # Step 1: Get the logged-in student's Program, YearLevel, Semester
-        cursor.execute("SELECT Program, YearLevel, Semester FROM BSCSStudents WHERE Email = ?", (current_user.email,))
+        cursor.execute("SELECT Program, YearLevel, Semester FROM Students WHERE UserID = ?", (current_user.id,))
         student = cursor.fetchone()
         print("DEBUG: Student lookup:", student)
 
@@ -105,7 +106,6 @@ def courses():
             print("DEBUG: Selected table =", table_name)
 
             if table_name:
-                # Step 2: Query enrolled courses with new columns
                 query = f"""
                     SELECT cr.CourseCode,
                            cr.CourseName,
@@ -140,6 +140,7 @@ def courses():
     conn.close()
     return render_template('subpages/courses.html', courses=courses_data)
 
+
 #------------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------------
@@ -150,30 +151,55 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+#----------------------------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        firstname = request.form['firstname']
-        lastname = request.form['lastname']
-        email = request.form['email']
-        major = request.form['major']
-        password = bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-        role = 'student'
+        username = request.form['username']
+        password = request.form['password']
+        first_name = request.form['FirstName']
+        last_name = request.form['LastName']
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO Users (Email, Password, Role) VALUES (?, ?, ?)",
-            (email, password, role)
-        )
-        conn.commit()
-        conn.close()
 
-        flash('Registration successful! You can now log in.')
-        return redirect(url_for('login'))
+        try:
+            # 1. Insert into Users table
+            cursor.execute("""
+                INSERT INTO Users (Username, Password)
+                VALUES (?, ?)
+            """, (username, password))
+            conn.commit()
+
+            # 2. Get the new UserID
+            cursor.execute("SELECT @@IDENTITY")
+            new_user_id = cursor.fetchone()[0]
+
+            # 3. Insert into Students table linked to UserID
+            cursor.execute("""
+                INSERT INTO Students (UserID, FirstName, LastName, Program, YearLevel, Semester, Status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                new_user_id, first_name, last_name,
+                request.form.get('Program', ''), 
+                request.form.get('YearLevel', ''), 
+                request.form.get('Semester', ''), 
+                request.form.get('Status', 'Active')
+            ))
+            conn.commit()
+
+            flash("Registration successful! Student record created.", "success")
+            return redirect(url_for('login'))
+
+        except pyodbc.Error as e:
+            flash(f"Error during registration: {e}", "danger")
+        finally:
+            conn.close()
 
     return render_template('register.html')
+
+
+#------------------------------------------------------------------------------------
 
 @app.route('/viewcourses', methods=['GET', 'POST'])
 @login_required
@@ -231,76 +257,120 @@ def viewcourses():
                            search_query=search_query)
 
 #------------------------------------------------------------------------------------
-
-@app.route('/studentinfo')
+@app.route('/studentinfo', methods=['GET', 'POST'])
 @login_required
 def studentinfo():
-    # Establish the connection to your Access database
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch student information (personal, address, and emergency contact data)
-    student_data = {}
+    def row_to_dict(cursor, row):
+        if row is None:
+            return None
+        columns = [col[0] for col in cursor.description]
+        return dict(zip(columns, row))
+
+    if request.method == 'POST':
+        # Handle form submission: insert new student record linked to current user
+        try:
+            cursor.execute("""
+                INSERT INTO Students (UserID, FirstName, LastName, Program, YearLevel, Semester, Status,
+                                      StudentNumber, Birthday, Age, Birthplace, Sex, CellphoneNumber,
+                                      Email, CivilStatus, Nationality, Religion,
+                                      HouseNumber, Street, Barangay, City, Province, ZipCode,
+                                      [Telphone/MobileNumber], ContactPerson, Relation, ContactNumber, Address)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                current_user.id,  # <-- link student record to logged-in user
+                request.form['FirstName'], request.form['LastName'], request.form['Program'],
+                request.form['YearLevel'], request.form['Semester'], request.form['Status'],
+                request.form['StudentNumber'], request.form['Birthday'], request.form['Age'],
+                request.form['Birthplace'], request.form['Sex'], request.form['CellphoneNumber'],
+                request.form['Email'], request.form['CivilStatus'], request.form['Nationality'],
+                request.form['Religion'], request.form['HouseNumber'], request.form['Street'],
+                request.form['Barangay'], request.form['City'], request.form['Province'],
+                request.form['ZipCode'], request.form['Telphone/MobileNumber'],
+                request.form['ContactPerson'], request.form['Relation'],
+                request.form['ContactNumber'], request.form['Address']
+            ))
+            conn.commit()
+            flash("Student information created successfully!", "success")
+            return redirect(url_for('studentinfo'))
+        except pyodbc.Error as e:
+            flash(f"Error inserting data: {e}", "danger")
+
+    student_data = {
+        'personal': None,
+        'address': None,
+        'emergency': None
+    }
+
     try:
-        # Fetch personal information
+        # Query student record by UserID
         query = """
-            SELECT 
-                FirstName, 
-                LastName, 
-                Program, 
-                YearLevel, 
-                Semester, 
-                Status, 
-                StudentNumber, 
-                Birthday, 
-                Age, 
-                Birthplace, 
-                Sex, 
-                CellphoneNumber, 
-                Email, 
-                CivilStatus, 
-                Nationality, 
-                Religion
-            FROM Students
-            WHERE StudentID = ?
+            SELECT s.StudentID, s.FirstName, s.LastName, p.ProgramName, 
+                   s.YearLevel, s.Semester, s.Status,
+                   s.StudentNumber, s.Birthday, s.Age, s.Birthplace, s.Sex, s.CellphoneNumber,
+                   s.Email, s.CivilStatus, s.Nationality, s.Religion,
+                   s.HouseNumber, s.Street, s.Barangay, s.City, s.Province, s.ZipCode,
+                   s.[Telphone/MobileNumber], s.ContactPerson, s.Relation, s.ContactNumber, s.Address
+            FROM Students AS s
+            LEFT JOIN Programs AS p ON s.Program = p.ProgramID
+            WHERE s.UserID = ?
         """
         cursor.execute(query, (current_user.id,))
-        student_data['personal'] = cursor.fetchone()
+        row = cursor.fetchone()
+        student_dict = row_to_dict(cursor, row)
 
-        # Fetch permanent address
-        query = """
-            SELECT 
-                HouseNumber, 
-                Street, 
-                Barangay, 
-                City, 
-                Province, 
-                ZipCode
-            FROM PermanentAddress
-            WHERE StudentID = ?
-        """
-        cursor.execute(query, (current_user.id,))
-        student_data['address'] = cursor.fetchone()
+        if student_dict:
+            # Format birthday nicely
+            birthday = student_dict['Birthday']
+            if isinstance(birthday, (datetime.date, datetime.datetime)):
+                birthday_str = birthday.strftime("%B %d, %Y")
+            else:
+                birthday_str = birthday if birthday else ""
 
-        # Fetch emergency contact
-        query = """
-            SELECT 
-                ContactNumber, 
-                ContactPerson, 
-                Relation, 
-                ContactAddress 
-            FROM EmergencyContact
-            WHERE StudentID = ?
-        """
-        cursor.execute(query, (current_user.id,))
-        student_data['emergency'] = cursor.fetchone()
+            student_data['personal'] = {
+                'FirstName': student_dict['FirstName'],
+                'LastName': student_dict['LastName'],
+                'Program': student_dict['ProgramName'] if student_dict['ProgramName'] else student_dict['Program'],
+                'YearLevel': student_dict['YearLevel'],
+                'Semester': student_dict['Semester'],
+                'Status': student_dict['Status'],
+                'StudentNumber': student_dict['StudentNumber'],
+                'Birthday': birthday_str,
+                'Age': student_dict['Age'],
+                'Birthplace': student_dict['Birthplace'],
+                'Sex': student_dict['Sex'],
+                'CellphoneNumber': student_dict['CellphoneNumber'],
+                'Email': student_dict['Email'],
+                'CivilStatus': student_dict['CivilStatus'],
+                'Nationality': student_dict['Nationality'],
+                'Religion': student_dict['Religion']
+            }
+            student_data['address'] = {
+                'HouseNumber': student_dict['HouseNumber'],
+                'Street': student_dict['Street'],
+                'Barangay': student_dict['Barangay'],
+                'City': student_dict['City'],
+                'Province': student_dict['Province'],
+                'ZipCode': student_dict['ZipCode']
+            }
+            student_data['emergency'] = {
+                'Telphone/MobileNumber': student_dict['Telphone/MobileNumber'],
+                'ContactPerson': student_dict['ContactPerson'],
+                'Relation': student_dict['Relation'],
+                'ContactNumber': student_dict['ContactNumber'],
+                'Address': student_dict['Address']
+            }
 
     except pyodbc.Error as e:
-        print(f"Error executing query: {e}")
-        student_data = None  # Handle error gracefully
-
+        flash(f"Error fetching data: {e}", "danger")
     finally:
         conn.close()
+
+    # If no student record exists, show register.html
+    if not student_data['personal']:
+        return render_template('register.html')
 
     return render_template('subpages/studentinfo.html', student_data=student_data)
 
@@ -322,11 +392,11 @@ def form137():
 def curriculum():
     conn = get_db_connection()
     cursor = conn.cursor()
-
     curriculum_data = {}
 
     try:
-        cursor.execute("SELECT Program FROM BSCSStudents WHERE Email = ?", (current_user.email,))
+        # Lookup student by UserID (not Email anymore)
+        cursor.execute("SELECT Program FROM Students WHERE UserID = ?", (current_user.id,))
         student = cursor.fetchone()
 
         if student:
@@ -369,7 +439,7 @@ def curriculum():
     return render_template('subpages/curriculum.html', curriculum=curriculum_data)
 
 
-# ✅ Placeholder route for checkbox form submission
+# ✅ Route for checkbox form submission
 @app.route('/update_curriculum', methods=['POST'])
 @login_required
 def update_curriculum():
@@ -379,7 +449,7 @@ def update_curriculum():
     selected_courses = request.form.getlist('selected_courses')
     print("DEBUG: Selected courses:", selected_courses)
 
-    # Placeholder: you can add DB update logic here later
+    # Placeholder: add DB update logic here later
     return redirect(url_for('curriculum'))
 
 #------------------------------------------------------------------------------------

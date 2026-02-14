@@ -2,176 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create Account - UNIDA CHRISTIAN COLLEGES</title>
-  <style>
-    :root {
-      --dark-green: #1E4D2B;
-      --green: #145c34;
-      --gold: #FFD700;
-      --white: #ffffff;
-      --off-white: #fdfdfd;
-    }
-
-    body {
-      background: linear-gradient(90deg, var(--dark-green) 0%, var(--green) 100%);
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-
-    .register-container {
-      width: 400px;
-      margin: 50px auto;
-    }
-
-    .register-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .register-header h1 {
-      color: var(--gold);
-      margin-bottom: 5px;
-    }
-
-    .register-header span {
-      color: var(--white);
-      font-size: 14px;
-    }
-
-    .register-card {
-      background-color: var(--white);
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      text-align: center;
-    }
-
-    /* FLOATING LABEL INPUTS */
-    .input-container {
-      position: relative;
-      width: 90%;
-      margin: 0 auto 20px;
-    }
-
-    .input-container input {
-      width: 100%;
-      padding: 15px 10px 15px 10px;
-      border: 1px solid var(--green);
-      border-radius: 5px;
-      font-size: 14px;
-      outline: none;
-      box-sizing: border-box;
-      background: none;
-    }
-
-    .input-container label {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #999;
-      font-size: 14px;
-      pointer-events: none;
-      transition: all 0.3s ease;
-    }
-
-    .input-container input:focus + label,
-    .input-container input:not(:placeholder-shown) + label {
-      top: 0px; /* Adjust the floating label height here */
-      font-size: 12px;
-      color: var(--dark-green);
-      background: var(--white);
-      padding: 0 4px;
-    }
-
-    /* BUTTON */
-    .register-card button {
-      display: block;
-      width: 90%;
-      margin: 0 auto;
-      padding: 15px;
-      background-color: var(--dark-green);
-      color: var(--gold);
-      border: 0;
-      border-radius: 5px;
-      font-size: 14px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .register-card button:hover {
-      background-color: var(--green);
-    }
-
-    .register-card .message {
-      margin-top: 15px;
-      font-size: 12px;
-      color: var(--dark-green);
-    }
-
-    .register-card .message a {
-      color: var(--gold);
-      text-decoration: none;
-    }
-  </style>
+  <title>Register Student - UNIDA CHRISTIAN COLLEGES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
 
-  <div class="register-container">
-    <div class="register-header">
-      <h1>UNIDA CHRISTIAN COLLEGES</h1>
-      <span>Create your account</span>
-    </div>
+<!-- Banner -->
+<div class="school-banner">
+  <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+  <h1>UNIDA CHRISTIAN COLLEGES</h1>
+  {% if current_user.is_authenticated %}
+  <div class="user-info">
+    {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+  {% endif %}
+</div>
 
-    <div class="register-card">
-      <form method="POST">
-        <div class="input-container">
-          <input type="text" name="firstname" placeholder=" " required>
-          <label>First Name</label>
-        </div>
+<!-- Main container (Sidebar + Content) -->
+<div class="main-container">
+  <div class="sidebar">
+    <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
 
-        <div class="input-container">
-          <input type="text" name="lastname" placeholder=" " required>
-          <label>Last Name</label>
-        </div>
+    <h2>Student Information</h2>
+    <ul>
+      <li><a href="/studentinfo" class="active">Student Information</a></li>
+      <li><a href="/schoolhistory">School History</a></li>
+      <li><a href="/form137">Grade History (Form 137)</a></li>
+    </ul>
 
-        <div class="input-container">
-          <input type="email" name="email" placeholder=" " required>
-          <label>Email</label>
-        </div>
+    <h2>Academic Performance</h2>
+    <ul>
+      <li><a href="/curriculum">Curriculum</a></li>
+      <li><a href="/grades">Grades</a></li>
+      <li><a href="/courses">Enrolled Courses</a></li>
+    </ul>
+  </div>
 
-        <div class="input-container">
-          <input type="text" name="yearlevel" placeholder=" " required>
-          <label>Year Level</label>
-        </div>
+  <div class="content">
+    <div class="card">
+      <h3>Register Student Information</h3>
+      <form method="POST" action="{{ url_for('studentinfo') }}">
+        <label>First Name:</label>
+        <input type="text" name="FirstName" required>
 
-        <div class="input-container">
-          <input type="text" name="major" placeholder=" " required>
-          <label>Major</label>
-        </div>
+        <label>Last Name:</label>
+        <input type="text" name="LastName" required>
 
-        <div class="input-container">
-          <input type="password" name="password" placeholder=" " required>
-          <label>Password</label>
-        </div>
+        <label>Program:</label>
+        <input type="text" name="Program" required>
+
+        <label>Year Level:</label>
+        <input type="number" name="YearLevel" required>
+
+        <label>Semester:</label>
+        <input type="number" name="Semester" required>
+
+        <label>Status:</label>
+        <input type="text" name="Status" required>
+
+        <!-- Add other fields as needed -->
 
         <button type="submit">Register</button>
-
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <p class="message">{{ messages[0] }}</p>
-          {% endif %}
-        {% endwith %}
-
-        <p class="message">Already have an account? <a href="/login">Login</a></p>
       </form>
     </div>
   </div>
+</div>
 
 </body>
 </html>

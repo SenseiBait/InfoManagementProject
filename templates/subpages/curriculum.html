@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>Curriculum - UNIDA CHRISTIAN COLLEGES</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-
 </head>
 <body>
 
+<!-- Banner -->
 <div class="school-banner">
   <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
   <h1>UNIDA CHRISTIAN COLLEGES</h1>
@@ -18,15 +18,18 @@
   {% endif %}
 </div>
 
+<!-- Main container -->
 <div class="main-container">
   <div class="sidebar">
     <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+
     <h2>Student Information</h2>
     <ul>
       <li><a href="/studentinfo">Student Information</a></li>
       <li><a href="/schoolhistory">School History</a></li>
       <li><a href="/form137">Grade History (Form 137)</a></li>
     </ul>
+
     <h2>Academic Performance</h2>
     <ul>
       <li><a href="/curriculum" class="active">Curriculum</a></li>
@@ -44,7 +47,7 @@
         <form method="POST" action="{{ url_for('update_curriculum') }}">
           {% for year_sem, courses in curriculum.items() %}
             <h4>{{ year_sem }}</h4>
-            <table border="1" cellpadding="5" style="margin-bottom:20px;">
+            <table>
               <thead>
                 <tr>
                   <th style="text-align:center;">Select</th>

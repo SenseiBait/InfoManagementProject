@@ -13,43 +13,44 @@
   font-family: Arial, sans-serif;
 }
 
+/* Banner */
 .school-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Centers the school name */
-    background-color: #1E4D2B;
-    color: #FFD700;
-    padding: 10px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    position: relative; /* for absolute positioning of user-info */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--dark-green);
+  color: var(--gold);
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  position: relative; /* for absolute positioning of user-info */
 }
 
 .school-banner img {
-    height: 50px;
-    margin-right: 15px;
+  height: 50px;
+  margin-right: 15px;
 }
 
 .school-banner h1 {
-    font-size: 1.5rem;
-    margin: 0;
-    flex: 1;
-    text-align: center;
+  font-size: 1.5rem;
+  margin: 0;
+  flex: 1;
+  text-align: center;
 }
 
 /* User info on the right */
 .school-banner .user-info {
-    position: absolute;
-    right: 20px;
-    font-size: 0.9rem;
-    color: #FFD700;
+  position: absolute;
+  right: 20px;
+  font-size: 0.9rem;
+  color: var(--gold);
 }
 
 .school-banner .user-info a {
-    color: #FFD700;
-    text-decoration: underline;
-    margin-left: 5px;
+  color: var(--gold);
+  text-decoration: underline;
+  margin-left: 5px;
 }
 
 /* Main container */
@@ -108,78 +109,89 @@
   margin-bottom: 20px;
 }
 
-/* Card spacing */
+/* Card */
 .card {
-    background-color: var(--white);
-    border: 2px solid var(--gold);
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 30px;  /* more space between cards */
+  background-color: var(--white);
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
 }
 
 /* Table styling inside cards */
 .card table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  display: block;
+  overflow-x: auto; /* responsive scroll */
 }
 
 .card table th,
 .card table td {
-    border: 1px solid var(--gold);
-    padding: 12px;  /* more space inside each cell */
-    text-align: left;
+  border: 1px solid var(--gold);
+  padding: 12px;
+  text-align: left;
 }
 
 .card table th {
-    background-color: var(--dark-green);
-    color: var(--gold);
+  background-color: var(--dark-green);
+  color: var(--gold);
 }
 
 .card table tr:nth-child(even) {
-    background-color: #f9f9f9;  /* alternate row color */
-}
-
-/* Optional: responsive table scroll */
-.card table {
-    display: block;
-    overflow-x: auto;
-}
-
-    .center-checkbox {
-      text-align: center;
-    }
-    .center-checkbox input[type="checkbox"] {
-      margin: auto;
-      display: block;
-    }
-
-    /* Card styling */
-.card {
   background-color: #f9f9f9;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
 }
 
-/* Row for each piece of info */
+/* Centered checkbox cells */
+.center-checkbox {
+  text-align: center;
+}
+.center-checkbox input[type="checkbox"] {
+  margin: auto;
+  display: block;
+}
+
+/* Layout for student information fields */
 .info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #ddd;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* two fields per row */
+  column-gap: 40px;              /* space between the two columns */
+  row-gap: 8px;                  /* tighter vertical spacing */
+  margin-bottom: 10px;
 }
 
-/* Labels and values */
+.info-field {
+  display: grid;
+  grid-template-columns: 200px auto; /* wider label column */
+  align-items: baseline;
+}
+
 .info-label {
   font-weight: bold;
-  width: 200px;  /* Fixed width for labels */
   text-align: right;
-  padding-right: 15px;
+  padding-right: 10px;
+  white-space: nowrap; /* prevent label from breaking */
 }
 
 .info-value {
-  flex: 1;
-  padding-left: 15px;
+  text-align: left;
+  white-space: nowrap; /* optional: prevent values from breaking too */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .info-row {
+    grid-template-columns: 1fr; /* stack fields vertically */
+    row-gap: 8px;
+  }
+
+  .info-field {
+    grid-template-columns: auto; /* label/value stack */
+  }
+
+  .info-label {
+    text-align: left;
+    padding-right: 0;
+  }
 }
