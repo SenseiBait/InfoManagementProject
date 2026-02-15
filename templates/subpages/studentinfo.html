@@ -69,7 +69,6 @@
                         <div class="info-value">
                             {% if student_data.personal.Semester == 1 %}1st Semester
                             {% elif student_data.personal.Semester == 2 %}2nd Semester
-                            {% elif student_data.personal.Semester == 3 %}3rd Semester
                             {% else %}N/A{% endif %}
                         </div>
                     </div>
@@ -165,7 +164,7 @@
 
 
             <!-- Edit Button -->
-            <button onclick="window.location.href='{{ url_for('edit_studentinfo') }}'">Edit Information</button>
+            <a href="{{ url_for('edit_studentinfo') }}" class="btn-update">Edit Information</a>
 
             <!-- Edit Form (hidden by default) -->
             <div id="edit-form" style="display:none;">

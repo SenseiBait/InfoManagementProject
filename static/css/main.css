@@ -21,10 +21,9 @@
   background-color: var(--dark-green);
   color: var(--gold);
   padding: 10px 20px;
-  position: sticky;
+  position: sticky;   /* stays at top when scrolling */
   top: 0;
-  z-index: 1000;
-  position: relative;
+  z-index: 1000;      /* ensures it stays above sidebar/content */
 }
 
 .school-banner img {
@@ -65,6 +64,16 @@
   color: var(--white);
   padding: 25px;
   flex-shrink: 0;
+
+  /* ✅ Fixed sidebar aligned with banner */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;        /* full viewport height */
+  overflow-y: auto;     /* scroll inside if content is taller */
+
+  /* Push content down so it doesn’t overlap banner */
+  padding-top: 60px;    /* adjust to match banner height */
 }
 
 .sidebar h2 {
@@ -99,6 +108,7 @@
 .content {
   flex: 1;
   padding: 40px;
+  margin-left: 260px;   /* offset for fixed sidebar */
 }
 
 .content h1 {
@@ -115,9 +125,8 @@
   margin-bottom: 30px;
 }
 
-/* ===== Table Styling (shared by Enrolled Courses & Curriculum) ===== */
-.card table,
-.curriculum-card table {
+/* ===== Enrolled Courses Table ===== */
+.card.enrolled-courses table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
@@ -125,102 +134,90 @@
   overflow-x: auto;
 }
 
-.card table th,
-.card table td,
-.curriculum-card table th,
-.curriculum-card table td {
+.card.enrolled-courses th,
+.card.enrolled-courses td {
   border: 1px solid var(--gold);
-  padding: 12px;
+  padding: 10px;
   text-align: left;
 }
 
-.card table th,
-.curriculum-card table th {
+.card.enrolled-courses th {
   background-color: var(--dark-green);
   color: var(--gold);
+  font-weight: bold;
 }
 
-.card table tr:nth-child(even),
-.curriculum-card table tr:nth-child(even) {
+/* Compact numeric columns */
+.card.enrolled-courses th:nth-child(3),
+.card.enrolled-courses td:nth-child(3), /* Credits */
+.card.enrolled-courses th:nth-child(4),
+.card.enrolled-courses td:nth-child(4), /* Year Level */
+.card.enrolled-courses th:nth-child(5),
+.card.enrolled-courses td:nth-child(5)  /* Semester */ {
+  width: 80px;
+  text-align: center;
+}
+
+/* Text-heavy columns expand */
+.card.enrolled-courses th:nth-child(2),
+.card.enrolled-courses td:nth-child(2), /* Course Name */
+.card.enrolled-courses th:nth-child(8),
+.card.enrolled-courses td:nth-child(8)  /* Instructor */ {
+  min-width: 200px;
+}
+
+/* Optional: striped rows for readability */
+.card.enrolled-courses tr:nth-child(even) {
   background-color: #f9f9f9;
 }
 
-/* Compact column widths for Curriculum/Enrolled Courses */
-.card table th:first-child,
-.card table td:first-child,
-.curriculum-card table th:first-child,
-.curriculum-card table td:first-child {
-  width: 60px; /* Taken checkbox */
-  text-align: center;
+/* ===== Curriculum Table ===== */
+.card.curriculum-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  table-layout: fixed;   /* respect colgroup widths */
 }
 
-.card table th:nth-child(2),
-.card table td:nth-child(2),
-.curriculum-card table th:nth-child(2),
-.curriculum-card table td:nth-child(2) {
-  width: 120px; /* Course Code */
+.card.curriculum-card th,
+.card.curriculum-card td {
+  border: 1px solid var(--gold);
+  padding: 8px;
+  text-align: left;
 }
 
-.card table th:nth-child(3),
-.card table td:nth-child(3),
-.curriculum-card table th:nth-child(3),
-.curriculum-card table td:nth-child(3) {
-  width: 300px; /* Course Name */
+.card.curriculum-card th {
+  background-color: var(--dark-green);
+  color: var(--gold);
+  font-weight: bold;
 }
 
-.card table th:nth-child(4),
-.card table td:nth-child(4),
-.curriculum-card table th:nth-child(4),
-.curriculum-card table td:nth-child(4) {
-  width: 80px; /* Credits */
-  text-align: center;
+/* Optional: striped rows */
+.card.curriculum-card tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-/* Grades, Remarks, Instructor auto-adjust */
-.card table th:nth-child(5),
-.card table td:nth-child(5),
-.card table th:nth-child(6),
-.card table td:nth-child(6),
-.card table th:nth-child(7),
-.card table td:nth-child(7),
-.curriculum-card table th:nth-child(5),
-.curriculum-card table td:nth-child(5),
-.curriculum-card table th:nth-child(6),
-.curriculum-card table td:nth-child(6),
-.curriculum-card table th:nth-child(7),
-.curriculum-card table td:nth-child(7) {
-  min-width: 120px;
-}
-
+/* Center checkbox styling */
 .center-checkbox {
   text-align: center;
 }
+
 .center-checkbox input[type="checkbox"] {
-  margin: auto;
+  margin: 0 auto;
   display: block;
+  width: 20px;   /* Adjust width of the checkbox */
+  height: 20px;  /* Adjust height of the checkbox */
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.curriculum-card {
-  background-color: var(--white);
-  border: 2px solid var(--gold);
-  border-radius: 10px;
-  padding: 25px;
-  margin-bottom: 30px;
+/* Make sure the table layout respects the colgroup */
+.card.curriculum-card table td,
+.card.curriculum-card table th {
+  word-wrap: break-word;  /* Prevent content from overflowing */
 }
 
-.curriculum-card h3 {
-  color: var(--dark-green);
-  margin-bottom: 15px;
-}
-
-.curriculum-card .no-data {
-  text-align: center;
-  font-style: italic;
-  color: #555;
-  padding: 20px;
-}
-
-/* ===== Student Info Layout (/register) ===== */
+/* ===== Student Info Layout (/register & /edit_studentinfo) ===== */
 .info-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -247,7 +244,7 @@
   white-space: nowrap;
 }
 
-/* Section headings in /register */
+/* Section headings */
 .card h4 {
   color: var(--dark-green);
   margin: 20px 0 10px;
@@ -255,7 +252,7 @@
   padding-bottom: 5px;
 }
 
-/* Page-specific form rules for /register */
+/* Page-specific form rules */
 .card form label {
   display: inline-block;
   width: 180px;
@@ -275,10 +272,11 @@
   vertical-align: middle;
 }
 
-.card form button {
+.btn-update {
   display: block;
   margin: 30px auto 0;
   padding: 12px 30px;
+  width: fit-content;          /* keeps width tight to text */
   background-color: var(--dark-green);
   color: var(--gold);
   border: none;
@@ -286,10 +284,19 @@
   cursor: pointer;
   font-weight: bold;
   text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
 }
 
-.card form button:hover {
+.btn-update:hover {
   background-color: var(--green);
+}
+
+/* Center buttons inside forms/cards */
+.card form button,
+.card .btn-update {
+  display: block;
+  margin: 30px auto 0;
 }
 
 /* Emergency Contact tweaks */

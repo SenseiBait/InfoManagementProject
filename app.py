@@ -4,6 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 import bcrypt
 import datetime
 from datetime import datetime
+from datetime import datetime, date
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change to a random string for security
@@ -202,6 +203,13 @@ def register():
             return None
         return str(val).strip()
 
+    def calculate_age(bday):
+        """Return age in years given a date object."""
+        if not bday:
+            return None
+        today = date.today()
+        return today.year - bday.year - ((today.month, today.day) < (bday.month, bday.day))
+
     if request.method == "POST":
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -220,16 +228,18 @@ def register():
             Status = safe_value(request.form.get("Status"))
             StudentNumber = safe_value(request.form.get("StudentNumber"))
 
+            # Birthday + auto age
             Birthday_raw = request.form.get("Birthday")
             Birthday = None
+            Age = None
             if Birthday_raw:
                 try:
                     Birthday = datetime.strptime(Birthday_raw, "%Y-%m-%d").date()
+                    Age = calculate_age(Birthday)  # ✅ auto-calculate age
                 except ValueError:
                     Birthday = None
+                    Age = None
 
-            Age_raw = request.form.get("Age")
-            Age = int(Age_raw) if Age_raw and Age_raw.isdigit() else None
             Birthplace = safe_value(request.form.get("Birthplace"))
             Sex = safe_value(request.form.get("Sex"))
             CellphoneNumber = safe_value(request.form.get("CellphoneNumber"))
@@ -263,7 +273,7 @@ def register():
                 Address = ", ".join(filter(None, [
                     safe_value(request.form.get('EmergencyHouseNumber')),
                     safe_value(request.form.get('EmergencyStreet')),
-                    safe_value(request.form.get('EmergencyVillage')),   # ✅ Village included
+                    safe_value(request.form.get('EmergencyVillage')),
                     safe_value(request.form.get('EmergencyBarangay')),
                     safe_value(request.form.get('EmergencyCity')),
                     safe_value(request.form.get('EmergencyProvince')),
@@ -339,6 +349,13 @@ def edit_studentinfo():
         columns = [col[0] for col in cursor.description]
         return dict(zip(columns, row))
 
+    def calculate_age(bday):
+        """Return age in years given a date object."""
+        if not bday:
+            return None
+        today = date.today()
+        return today.year - bday.year - ((today.month, today.day) < (bday.month, bday.day))
+
     if request.method == 'POST':
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -349,8 +366,8 @@ def edit_studentinfo():
         Program = safe_int(request.form.get('Program'))
         YearLevel = safe_int(request.form.get('YearLevel'))
         Semester = safe_int(request.form.get('Semester'))
-        Birthday = safe_date(request.form.get('Birthday'))
-        Age = safe_int(request.form.get('Age'))
+        Birthday = safe_date(request.form.get('Birthday'))   # stored as date
+        Age = calculate_age(Birthday)  # auto-calculate age
         Status = safe_value(request.form.get('Status'))
         StudentNumber = safe_value(request.form.get('StudentNumber'))
         Birthplace = safe_value(request.form.get('Birthplace'))
@@ -389,7 +406,7 @@ def edit_studentinfo():
             """, (FirstName, LastName, Program, YearLevel, Semester, Birthday, Age, Status,
                   StudentNumber, Birthplace, Sex, CellphoneNumber, Email, CivilStatus, Nationality, Religion,
                   HouseNumber, Street, Village, Barangay, City, Province, ZIPCode, TelephoneMobileNumber,
-                  ContactPerson, ContactNumber, Relation, Address, int(current_user.id)))  # force int
+                  ContactPerson, ContactNumber, Relation, Address, int(current_user.id)))
 
             if cursor.rowcount == 0:
                 flash("No rows updated — check that UserID exists.", "warning")
@@ -413,6 +430,25 @@ def edit_studentinfo():
     cursor.close()
     conn.close()
 
+    # --- FIX: normalize Birthday for <input type="date"> ---
+    if student_data.get('Birthday'):
+        try:
+            if isinstance(student_data['Birthday'], (datetime, date)):
+                student_data['Birthday'] = student_data['Birthday'].strftime("%Y-%m-%d")
+            else:
+                student_data['Birthday'] = datetime.strptime(str(student_data['Birthday']), "%Y-%m-%d").strftime("%Y-%m-%d")
+        except Exception:
+            student_data['Birthday'] = None
+
+    # Auto-calculate Age if Birthday exists
+    age_val = None
+    if student_data.get('Birthday'):
+        try:
+            bday_obj = datetime.strptime(student_data['Birthday'], "%Y-%m-%d").date()
+            age_val = calculate_age(bday_obj)
+        except Exception:
+            age_val = None
+
     # Group into personal, address, emergency
     student_data['personal'] = {
         'FirstName': student_data.get('FirstName'),
@@ -421,7 +457,7 @@ def edit_studentinfo():
         'YearLevel': student_data.get('YearLevel'),
         'Semester': student_data.get('Semester'),
         'Birthday': student_data.get('Birthday'),
-        'Age': student_data.get('Age'),
+        'Age': age_val if age_val is not None else student_data.get('Age'),
         'Status': student_data.get('Status'),
         'StudentNumber': student_data.get('StudentNumber'),
         'Birthplace': student_data.get('Birthplace'),
@@ -559,10 +595,22 @@ def studentinfo():
         student_dict = row_to_dict(cursor, row)
 
         if student_dict:
+            # ✅ Program ID → Program Name mapping
+            program_map = {
+                1: "BSCS",
+                2: "ACT",
+                3: "BAOM",
+                4: "BAHRM",
+                5: "BEED",
+                6: "BSED SOC",
+                7: "BSED VAL",
+                8: "BSED ENG"
+            }
+
             student_data['personal'] = {
                 'FirstName': safe_value(student_dict.get('FirstName')),
                 'LastName': safe_value(student_dict.get('LastName')),
-                'Program': safe_value(student_dict.get('Program')),
+                'Program': program_map.get(student_dict.get('Program')),  # ✅ mapped name
                 'YearLevel': safe_value(student_dict.get('YearLevel')),
                 'Semester': safe_value(student_dict.get('Semester')),
                 'Status': safe_value(student_dict.get('Status')),
@@ -577,6 +625,7 @@ def studentinfo():
                 'Nationality': safe_value(student_dict.get('Nationality')),
                 'Religion': safe_value(student_dict.get('Religion'))
             }
+
             student_data['address'] = {
                 'HouseNumber': safe_value(student_dict.get('HouseNumber')),
                 'Street': safe_value(student_dict.get('Street')),
@@ -587,6 +636,7 @@ def studentinfo():
                 'ZIPCode': safe_value(student_dict.get('ZIPCode')),
                 'TelephoneMobileNumber': safe_value(student_dict.get('TelephoneMobileNumber'))
             }
+
             student_data['emergency'] = {
                 'ContactPerson': safe_value(student_dict.get('ContactPerson')),
                 'Relation': safe_value(student_dict.get('Relation')),

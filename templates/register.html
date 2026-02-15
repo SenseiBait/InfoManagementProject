@@ -47,89 +47,89 @@
         <label>Password:</label>
         <input type="password" name="password" value="{{ masked_password }}" readonly><br><br>
 
-        <!-- Personal Info -->
-        <h4>Personal Information</h4>
-        <label>First Name:</label>
-        <input type="text" name="FirstName" required>
+ <h4>Personal Information</h4>
 
-        <label>Last Name:</label>
-        <input type="text" name="LastName" required>
+<label>First Name:</label>
+<input type="text" name="FirstName" required>
 
-        <label>Program:</label>
-        <select name="Program" required>
-          <option value="">-- Select Program --</option>
-          <option value="1">BSCS</option>
-          <option value="2">ACT</option>
-          <option value="3">BAOM</option>
-          <option value="4">BAHRM</option>
-          <option value="5">BEED</option>
-          <option value="6">BSED SOC</option>
-          <option value="7">BSED VAL</option>
-          <option value="8">BSED ENG</option>
-        </select>
+<label>Last Name:</label>
+<input type="text" name="LastName" required>
 
+<label>Program:</label>
+<select name="Program" required>
+  <option value="">-- Select Program --</option>
+  <option value="1">BSCS</option>
+  <option value="2">ACT</option>
+  <option value="3">BAOM</option>
+  <option value="4">BAHRM</option>
+  <option value="5">BEED</option>
+  <option value="6">BSED SOC</option>
+  <option value="7">BSED VAL</option>
+  <option value="8">BSED ENG</option>
+</select>
 
-        <label>Year Level:</label>
-        <select name="YearLevel" required>
-          <option value="">-- Select Year Level --</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-        </select>
+<label>Year Level:</label>
+<select name="YearLevel" required>
+  <option value="">-- Select Year Level --</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+</select>
 
-        <label>Semester:</label>
-        <select name="Semester" required>
-          <option value="">-- Select Semester --</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
+<label>Semester:</label>
+<select name="Semester" required>
+  <option value="">-- Select Semester --</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+</select>
 
-        <label>Status:</label>
-        <select name="Status" required>
-          <option value="Regular">Regular</option>
-          <option value="Irregular">Irregular</option>
-        </select>
+<label>Status:</label>
+<select name="Status" required>
+  <option value="Regular">Regular</option>
+  <option value="Irregular">Irregular</option>
+</select>
 
-        <label>Student Number:</label>
-        <input type="text" name="StudentNumber">
+<label>Student Number:</label>
+<input type="text" name="StudentNumber">
 
-        <label>Birthday:</label>
-        <input type="date" name="Birthday">
+<label>Birthday:</label>
+<input type="date" id="birthday" name="Birthday" required>
 
-        <label>Age:</label>
-        <input type="number" name="Age">
+<label>Age:</label>
+<!-- ✅ Age is now read-only, updated live by JS -->
+<input type="number" id="age" name="Age" readonly>
 
-        <label>Birthplace:</label>
-        <input type="text" name="Birthplace">
+<label>Birthplace:</label>
+<input type="text" name="Birthplace">
 
-        <label>Sex:</label>
-        <select name="Sex" required>
-          <option value="">-- Select Sex --</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
+<label>Sex:</label>
+<select name="Sex" required>
+  <option value="">-- Select Sex --</option>
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+</select>
 
-        <label>Cellphone Number:</label>
-        <input type="text" name="CellphoneNumber">
+<label>Cellphone Number:</label>
+<input type="text" name="CellphoneNumber">
 
-        <label>Email:</label>
-        <input type="email" name="Email" value="{{ current_user.email }}" readonly>
+<label>Email:</label>
+<input type="email" name="Email" value="{{ current_user.email }}" readonly>
 
-        <label>Civil Status:</label>
-        <select name="CivilStatus" required>
-          <option value="">-- Select Civil Status --</option>
-          <option value="Single">Single</option>
-          <option value="Married">Married</option>
-          <option value="Widowed">Widowed</option>
-          <option value="Separated">Separated</option>
-        </select>
+<label>Civil Status:</label>
+<select name="CivilStatus" required>
+  <option value="">-- Select Civil Status --</option>
+  <option value="Single">Single</option>
+  <option value="Married">Married</option>
+  <option value="Widowed">Widowed</option>
+  <option value="Separated">Separated</option>
+</select>
 
-        <label>Nationality:</label>
-        <input type="text" name="Nationality">
+<label>Nationality:</label>
+<input type="text" name="Nationality">
 
-        <label>Religion:</label>
-        <input type="text" name="Religion"><br><br>
+<label>Religion:</label>
+<input type="text" name="Religion"><br><br>
 
         <!-- Address Info -->
       <h4>Address Information</h4>
@@ -217,7 +217,27 @@
   checkbox.addEventListener('change', function() {
     emergencyFields.style.display = this.checked ? 'none' : 'block';
   });
+
+  // ✅ Auto-calculate Age from Birthday
+  const birthdayInput = document.getElementById('birthday');
+  const ageInput = document.getElementById('age');
+
+  birthdayInput.addEventListener('change', function() {
+    const bday = new Date(this.value);
+    if (!isNaN(bday)) {
+      const today = new Date();
+      let age = today.getFullYear() - bday.getFullYear();
+      const m = today.getMonth() - bday.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < bday.getDate())) {
+        age--;
+      }
+      ageInput.value = age;
+    } else {
+      ageInput.value = '';
+    }
+  });
 </script>
+
 
 </body>
 </html>
