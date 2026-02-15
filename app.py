@@ -197,27 +197,28 @@ def logout():
 @app.route("/register", methods=["GET", "POST"])
 @login_required
 def register():
+    def safe_value(val):
+        if val is None or val.strip() == '' or val.strip().lower() == 'none':
+            return None
+        return str(val).strip()
+
     if request.method == "POST":
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
-            UserID = current_user.id  
+            UserID = int(current_user.id)
 
             # Personal info
-            FirstName = request.form.get("FirstName")
-            LastName = request.form.get("LastName")
-
+            FirstName = safe_value(request.form.get("FirstName"))
+            LastName = safe_value(request.form.get("LastName"))
             Program_raw = request.form.get("Program")
             Program = int(Program_raw) if Program_raw and Program_raw.isdigit() else None
-
             YearLevel_raw = request.form.get("YearLevel")
             YearLevel = int(YearLevel_raw) if YearLevel_raw and YearLevel_raw.isdigit() else None
-
             Semester_raw = request.form.get("Semester")
             Semester = int(Semester_raw) if Semester_raw and Semester_raw.isdigit() else None
-
-            Status = request.form.get("Status")
-            StudentNumber = request.form.get("StudentNumber")
+            Status = safe_value(request.form.get("Status"))
+            StudentNumber = safe_value(request.form.get("StudentNumber"))
 
             Birthday_raw = request.form.get("Birthday")
             Birthday = None
@@ -229,29 +230,28 @@ def register():
 
             Age_raw = request.form.get("Age")
             Age = int(Age_raw) if Age_raw and Age_raw.isdigit() else None
-
-            Birthplace = request.form.get("Birthplace")
-            Sex = request.form.get("Sex")
-            CellphoneNumber = request.form.get("CellphoneNumber")
-            Email = request.form.get("Email")
-            CivilStatus = request.form.get("CivilStatus")
-            Nationality = request.form.get("Nationality")
-            Religion = request.form.get("Religion")
+            Birthplace = safe_value(request.form.get("Birthplace"))
+            Sex = safe_value(request.form.get("Sex"))
+            CellphoneNumber = safe_value(request.form.get("CellphoneNumber"))
+            Email = safe_value(request.form.get("Email"))
+            CivilStatus = safe_value(request.form.get("CivilStatus"))
+            Nationality = safe_value(request.form.get("Nationality"))
+            Religion = safe_value(request.form.get("Religion"))
 
             # Address info
-            HouseNumber = request.form.get("HouseNumber")
-            Street = request.form.get("Street")
-            Village = request.form.get("Village")
-            Barangay = request.form.get("Barangay")
-            City = request.form.get("City")
-            Province = request.form.get("Province")
-            ZIPCode = request.form.get("ZIPCode")
-            TelephoneMobileNumber = request.form.get("TelephoneMobileNumber")
+            HouseNumber = safe_value(request.form.get("HouseNumber"))
+            Street = safe_value(request.form.get("Street"))
+            Village = safe_value(request.form.get("Village"))
+            Barangay = safe_value(request.form.get("Barangay"))
+            City = safe_value(request.form.get("City"))
+            Province = safe_value(request.form.get("Province"))
+            ZIPCode = safe_value(request.form.get("ZIPCode"))
+            TelephoneMobileNumber = safe_value(request.form.get("TelephoneMobileNumber"))
 
             # Emergency contact
-            ContactPerson = request.form.get("ContactPerson")
-            ContactNumber = request.form.get("ContactNumber")
-            Relation = request.form.get("Relation")
+            ContactPerson = safe_value(request.form.get("ContactPerson"))
+            ContactNumber = safe_value(request.form.get("ContactNumber"))
+            Relation = safe_value(request.form.get("Relation"))
 
             # Emergency address logic
             SameAddress = request.form.get("SameAddress")
@@ -261,19 +261,20 @@ def register():
                 ]))
             else:
                 Address = ", ".join(filter(None, [
-                    request.form.get('EmergencyHouseNumber'),
-                    request.form.get('EmergencyStreet'),
-                    request.form.get('EmergencyVillage'),
-                    request.form.get('EmergencyBarangay'),
-                    request.form.get('EmergencyCity'),
-                    request.form.get('EmergencyProvince'),
-                    request.form.get('EmergencyZIPCode')
+                    safe_value(request.form.get('EmergencyHouseNumber')),
+                    safe_value(request.form.get('EmergencyStreet')),
+                    safe_value(request.form.get('EmergencyVillage')),   # ✅ Village included
+                    safe_value(request.form.get('EmergencyBarangay')),
+                    safe_value(request.form.get('EmergencyCity')),
+                    safe_value(request.form.get('EmergencyProvince')),
+                    safe_value(request.form.get('EmergencyZIPCode'))
                 ]))
-                tel = request.form.get('EmergencyTelephoneMobileNumber')
+                tel = safe_value(request.form.get('EmergencyTelephoneMobileNumber'))
                 if tel:
                     Address += f" (Tel: {tel})"
 
-            # Final tuple (29 values)
+            print("DEBUG Address before insert:", Address)
+
             values_tuple = (
                 UserID, FirstName, LastName, Program, YearLevel, Semester, Status,
                 StudentNumber, Birthday, Age, Birthplace, Sex, CellphoneNumber,
@@ -281,7 +282,6 @@ def register():
                 HouseNumber, Street, Village, Barangay, City, Province, ZIPCode, TelephoneMobileNumber,
                 ContactPerson, Relation, ContactNumber, Address
             )
-            print("DEBUG values length:", len(values_tuple))  # must print 29
 
             cursor.execute("""
                 INSERT INTO Students (
@@ -312,7 +312,148 @@ def register():
     )
 
 #------------------------------------------------------------------------------------
+@app.route('/edit_studentinfo', methods=['GET', 'POST'])
+@login_required
+def edit_studentinfo():
+    def safe_value(val):
+        if val is None or str(val).strip() == '' or str(val).strip().lower() == 'none':
+            return None
+        return str(val).strip()
 
+    def safe_int(val):
+        if val and str(val).isdigit():
+            return int(val)
+        return None
+
+    def safe_date(val):
+        if val:
+            try:
+                return datetime.strptime(val, "%Y-%m-%d").date()
+            except ValueError:
+                return None
+        return None
+
+    def row_to_dict(cursor, row):
+        if row is None:
+            return None
+        columns = [col[0] for col in cursor.description]
+        return dict(zip(columns, row))
+
+    if request.method == 'POST':
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Personal info
+        FirstName = safe_value(request.form.get('FirstName'))
+        LastName = safe_value(request.form.get('LastName'))
+        Program = safe_int(request.form.get('Program'))
+        YearLevel = safe_int(request.form.get('YearLevel'))
+        Semester = safe_int(request.form.get('Semester'))
+        Birthday = safe_date(request.form.get('Birthday'))
+        Age = safe_int(request.form.get('Age'))
+        Status = safe_value(request.form.get('Status'))
+        StudentNumber = safe_value(request.form.get('StudentNumber'))
+        Birthplace = safe_value(request.form.get('Birthplace'))
+        Sex = safe_value(request.form.get('Sex'))
+        CellphoneNumber = safe_value(request.form.get('CellphoneNumber'))
+        Email = safe_value(request.form.get('Email'))
+        CivilStatus = safe_value(request.form.get('CivilStatus'))
+        Nationality = safe_value(request.form.get('Nationality'))
+        Religion = safe_value(request.form.get('Religion'))
+
+        # Address info
+        HouseNumber = safe_value(request.form.get('HouseNumber'))
+        Street = safe_value(request.form.get('Street'))
+        Village = safe_value(request.form.get('Village'))
+        Barangay = safe_value(request.form.get('Barangay'))
+        City = safe_value(request.form.get('City'))
+        Province = safe_value(request.form.get('Province'))
+        ZIPCode = safe_value(request.form.get('ZIPCode'))
+        TelephoneMobileNumber = safe_value(request.form.get('TelephoneMobileNumber'))
+
+        # Emergency contact
+        ContactPerson = safe_value(request.form.get('ContactPerson'))
+        ContactNumber = safe_value(request.form.get('ContactNumber'))
+        Relation = safe_value(request.form.get('Relation'))
+        Address = safe_value(request.form.get('EmergencyAddress'))  # stored in Address column
+
+        try:
+            cursor.execute("""
+                UPDATE Students
+                SET FirstName = ?, LastName = ?, Program = ?, YearLevel = ?, Semester = ?, 
+                    Birthday = ?, Age = ?, Status = ?, StudentNumber = ?, Birthplace = ?, 
+                    Sex = ?, CellphoneNumber = ?, Email = ?, CivilStatus = ?, Nationality = ?, Religion = ?,
+                    HouseNumber = ?, Street = ?, Village = ?, Barangay = ?, City = ?, Province = ?, 
+                    ZIPCode = ?, TelephoneMobileNumber = ?, ContactPerson = ?, ContactNumber = ?, Relation = ?, Address = ?
+                WHERE UserID = ?
+            """, (FirstName, LastName, Program, YearLevel, Semester, Birthday, Age, Status,
+                  StudentNumber, Birthplace, Sex, CellphoneNumber, Email, CivilStatus, Nationality, Religion,
+                  HouseNumber, Street, Village, Barangay, City, Province, ZIPCode, TelephoneMobileNumber,
+                  ContactPerson, ContactNumber, Relation, Address, int(current_user.id)))  # force int
+
+            if cursor.rowcount == 0:
+                flash("No rows updated — check that UserID exists.", "warning")
+            else:
+                conn.commit()
+                flash("Information updated successfully!", "success")
+            return redirect(url_for('studentinfo'))
+        except Exception as e:
+            flash(f"Error updating information: {e}", "danger")
+            print("SQL Error:", e)
+        finally:
+            cursor.close()
+            conn.close()
+
+    # GET request: load existing data
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Students WHERE UserID = ?", (int(current_user.id),))
+    row = cursor.fetchone()
+    student_data = row_to_dict(cursor, row)
+    cursor.close()
+    conn.close()
+
+    # Group into personal, address, emergency
+    student_data['personal'] = {
+        'FirstName': student_data.get('FirstName'),
+        'LastName': student_data.get('LastName'),
+        'Program': student_data.get('Program'),
+        'YearLevel': student_data.get('YearLevel'),
+        'Semester': student_data.get('Semester'),
+        'Birthday': student_data.get('Birthday'),
+        'Age': student_data.get('Age'),
+        'Status': student_data.get('Status'),
+        'StudentNumber': student_data.get('StudentNumber'),
+        'Birthplace': student_data.get('Birthplace'),
+        'Sex': student_data.get('Sex'),
+        'CellphoneNumber': student_data.get('CellphoneNumber'),
+        'Email': student_data.get('Email'),
+        'CivilStatus': student_data.get('CivilStatus'),
+        'Nationality': student_data.get('Nationality'),
+        'Religion': student_data.get('Religion'),
+    }
+
+    student_data['address'] = {
+        'HouseNumber': student_data.get('HouseNumber'),
+        'Street': student_data.get('Street'),
+        'Village': student_data.get('Village'),
+        'Barangay': student_data.get('Barangay'),
+        'City': student_data.get('City'),
+        'Province': student_data.get('Province'),
+        'ZIPCode': student_data.get('ZIPCode'),
+        'TelephoneMobileNumber': student_data.get('TelephoneMobileNumber'),
+    }
+
+    student_data['emergency'] = {
+        'ContactPerson': student_data.get('ContactPerson'),
+        'ContactNumber': student_data.get('ContactNumber'),
+        'Relation': student_data.get('Relation'),
+        'Address': student_data.get('Address'),
+    }
+
+    return render_template('subpages/edit_studentinfo.html', student_data=student_data)
+
+#------------------------------------------------------------------------------------
 @app.route('/viewcourses', methods=['GET', 'POST'])
 @login_required
 def viewcourses():
@@ -381,6 +522,9 @@ def studentinfo():
         columns = [col[0] for col in cursor.description]
         return dict(zip(columns, row))
 
+    def safe_value(val):
+        return '' if val is None else val
+
     if request.method == 'POST':
         try:
             cursor.execute("""
@@ -391,16 +535,16 @@ def studentinfo():
                     Province=?, ZIPCode=?, TelephoneMobileNumber=?, ContactPerson=?, Relation=?, ContactNumber=?, Address=?
                 WHERE UserID=?
             """, (
-                request.form.get('FirstName', ''), request.form.get('LastName', ''), request.form.get('Program', ''),
-                request.form.get('YearLevel', ''), request.form.get('Semester', ''), request.form.get('Status', 'Active'),
-                request.form.get('StudentNumber', ''), request.form.get('Birthday', ''), request.form.get('Age', ''),
-                request.form.get('Birthplace', ''), request.form.get('Sex', ''), request.form.get('CellphoneNumber', ''),
-                request.form.get('Email', ''), request.form.get('CivilStatus', ''), request.form.get('Nationality', ''),
-                request.form.get('Religion', ''), request.form.get('HouseNumber', ''), request.form.get('Street', ''),
-                request.form.get('Village', ''), request.form.get('Barangay', ''), request.form.get('City', ''),
-                request.form.get('Province', ''), request.form.get('ZIPCode', ''), request.form.get('TelephoneMobileNumber', ''),
-                request.form.get('ContactPerson', ''), request.form.get('Relation', ''), request.form.get('ContactNumber', ''),
-                request.form.get('Address', ''), current_user.id
+                safe_value(request.form.get('FirstName')), safe_value(request.form.get('LastName')), request.form.get('Program'),
+                request.form.get('YearLevel'), request.form.get('Semester'), safe_value(request.form.get('Status', 'Active')),
+                safe_value(request.form.get('StudentNumber')), request.form.get('Birthday'), request.form.get('Age'),
+                safe_value(request.form.get('Birthplace')), safe_value(request.form.get('Sex')), safe_value(request.form.get('CellphoneNumber')),
+                safe_value(request.form.get('Email')), safe_value(request.form.get('CivilStatus')), safe_value(request.form.get('Nationality')),
+                safe_value(request.form.get('Religion')), safe_value(request.form.get('HouseNumber')), safe_value(request.form.get('Street')),
+                safe_value(request.form.get('Village')), safe_value(request.form.get('Barangay')), safe_value(request.form.get('City')),
+                safe_value(request.form.get('Province')), safe_value(request.form.get('ZIPCode')), safe_value(request.form.get('TelephoneMobileNumber')),
+                safe_value(request.form.get('ContactPerson')), safe_value(request.form.get('Relation')), safe_value(request.form.get('ContactNumber')),
+                safe_value(request.form.get('Address')), current_user.id
             ))
             conn.commit()
             flash("Student information updated successfully!", "success")
@@ -416,39 +560,41 @@ def studentinfo():
 
         if student_dict:
             student_data['personal'] = {
-                'FirstName': student_dict.get('FirstName', ''),
-                'LastName': student_dict.get('LastName', ''),
-                'Program': student_dict.get('Program', ''),
-                'YearLevel': student_dict.get('YearLevel', ''),
-                'Semester': student_dict.get('Semester', ''),
-                'Status': student_dict.get('Status', ''),
-                'StudentNumber': student_dict.get('StudentNumber', ''),
-                'Birthday': student_dict.get('Birthday', ''),
-                'Age': student_dict.get('Age', ''),
-                'Birthplace': student_dict.get('Birthplace', ''),
-                'Sex': student_dict.get('Sex', ''),
-                'CellphoneNumber': student_dict.get('CellphoneNumber', ''),
-                'Email': student_dict.get('Email', ''),
-                'CivilStatus': student_dict.get('CivilStatus', ''),
-                'Nationality': student_dict.get('Nationality', ''),
-                'Religion': student_dict.get('Religion', '')
+                'FirstName': safe_value(student_dict.get('FirstName')),
+                'LastName': safe_value(student_dict.get('LastName')),
+                'Program': safe_value(student_dict.get('Program')),
+                'YearLevel': safe_value(student_dict.get('YearLevel')),
+                'Semester': safe_value(student_dict.get('Semester')),
+                'Status': safe_value(student_dict.get('Status')),
+                'StudentNumber': safe_value(student_dict.get('StudentNumber')),
+                'Birthday': safe_value(student_dict.get('Birthday')),
+                'Age': safe_value(student_dict.get('Age')),
+                'Birthplace': safe_value(student_dict.get('Birthplace')),
+                'Sex': safe_value(student_dict.get('Sex')),
+                'CellphoneNumber': safe_value(student_dict.get('CellphoneNumber')),
+                'Email': safe_value(student_dict.get('Email')),
+                'CivilStatus': safe_value(student_dict.get('CivilStatus')),
+                'Nationality': safe_value(student_dict.get('Nationality')),
+                'Religion': safe_value(student_dict.get('Religion'))
             }
             student_data['address'] = {
-                'HouseNumber': student_dict.get('HouseNumber', ''),
-                'Street': student_dict.get('Street', ''),
-                'Village': student_dict.get('Village', ''),
-                'Barangay': student_dict.get('Barangay', ''),
-                'City': student_dict.get('City', ''),
-                'Province': student_dict.get('Province', ''),
-                'ZIPCode': student_dict.get('ZIPCode', ''),
-                'TelephoneMobileNumber': student_dict.get('TelephoneMobileNumber', '')
+                'HouseNumber': safe_value(student_dict.get('HouseNumber')),
+                'Street': safe_value(student_dict.get('Street')),
+                'Village': safe_value(student_dict.get('Village')),
+                'Barangay': safe_value(student_dict.get('Barangay')),
+                'City': safe_value(student_dict.get('City')),
+                'Province': safe_value(student_dict.get('Province')),
+                'ZIPCode': safe_value(student_dict.get('ZIPCode')),
+                'TelephoneMobileNumber': safe_value(student_dict.get('TelephoneMobileNumber'))
             }
             student_data['emergency'] = {
-                'ContactPerson': student_dict.get('ContactPerson', ''),
-                'Relation': student_dict.get('Relation', ''),
-                'ContactNumber': student_dict.get('ContactNumber', ''),
-                'Address': student_dict.get('Address', '')
+                'ContactPerson': safe_value(student_dict.get('ContactPerson')),
+                'Relation': safe_value(student_dict.get('Relation')),
+                'ContactNumber': safe_value(student_dict.get('ContactNumber')),
+                'Address': safe_value(student_dict.get('Address'))
             }
+
+            print("DEBUG Address from DB:", student_dict.get('Address'))
 
     except pyodbc.Error as e:
         flash(f"Error fetching data: {e}", "danger")

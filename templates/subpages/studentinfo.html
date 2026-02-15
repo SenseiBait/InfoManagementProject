@@ -1,9 +1,15 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Student Information - UNIDA CHRISTIAN COLLEGES</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script>
+        // Toggle the visibility of the edit form
+        function toggleEditForm() {
+            var editForm = document.getElementById("edit-form");
+            editForm.style.display = editForm.style.display === "block" ? "none" : "block";
+        }
+    </script>
 </head>
 <body>
     <!-- Banner -->
@@ -41,6 +47,7 @@
             <!-- Personal Information Card -->
             <div class="card student-info">
                 <h3>Personal Information</h3><br>
+
                 <div class="info-row">
                     <div class="info-field"><div class="info-label">First Name:</div><div class="info-value">{{ student_data.personal.FirstName | default("N/A", true) }}</div></div>
                     <div class="info-field"><div class="info-label">Last Name:</div><div class="info-value">{{ student_data.personal.LastName | default("N/A", true) }}</div></div>
@@ -95,6 +102,7 @@
                     <div class="info-field"><div class="info-label">Religion:</div><div class="info-value">{{ student_data.personal.Religion | default("N/A", true) }}</div></div>
                 </div>
             </div>
+
             <!-- Address Information Card -->
             <div class="card student-info">
                 <h3>Address Information</h3><br>
@@ -115,32 +123,82 @@
                     <div class="info-field"><div class="info-label">Telephone/Mobile:</div><div class="info-value">{{ student_data.address.TelephoneMobileNumber | default("N/A", true) }}</div></div>
                 </div>
             </div>
+<!-- Emergency Contact Card -->
+<div class="card student-info">
+    <h3>Emergency Contact</h3><br>
+    <div class="info-row">
+        <div class="info-field">
+            <div class="info-label">Contact Person:</div>
+            <div class="info-value">{{ student_data.emergency.ContactPerson | default("N/A", true) }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-label">Contact Number:</div>
+            <div class="info-value">{{ student_data.emergency.ContactNumber | default("N/A", true) }}</div>
+        </div>
+    </div>
+    <div class="info-row">
+        <div class="info-field">
+            <div class="info-label">Relation:</div>
+            <div class="info-value">{{ student_data.emergency.Relation | default("N/A", true) }}</div>
+        </div>
+    </div>
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Address:</div>
+        <div class="info-value">
+            {% set parts = [
+                student_data.address.HouseNumber,
+                student_data.address.Street,
+                student_data.address.Village,
+                student_data.address.Barangay,
+                student_data.address.City,
+                student_data.address.Province,
+                student_data.address.ZIPCode,
+                student_data.address.TelephoneMobileNumber
+            ] %}
+            {{ parts | reject("equalto", None) | reject("equalto", "") | join(", ") if parts else "N/A" }}
+        </div>
+    </div>
+</div>
 
-            <!-- Emergency Contact Card -->
-            <div class="card student-info">
-                <h3>Emergency Contact</h3><br>
-                <div class="info-row">
-                    <div class="info-field"><div class="info-label">Contact Person:</div><div class="info-value">{{ student_data.emergency.ContactPerson | default("N/A", true) }}</div></div>
-                    <div class="info-field"><div class="info-label">Contact Number:</div><div class="info-value">{{ student_data.emergency.ContactNumber | default("N/A", true) }}</div></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-field"><div class="info-label">Relation:</div><div class="info-value">{{ student_data.emergency.Relation | default("N/A", true) }}</div></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-field">
-                        <div class="info-label">Address:</div>
-                        <div class="info-value">
-                            {{ student_data.address.HouseNumber | default("N/A", true) }}
-                            {{ student_data.address.Street | default("N/A", true) }} Street,
-                            {{ student_data.address.Village | default("N/A", true) }},
-                            {{ student_data.address.Barangay | default("N/A", true) }},
-                            {{ student_data.address.City | default("N/A", true) }},
-                            {{ student_data.address.Province | default("N/A", true) }}
-                            {{ student_data.address.ZIPCode | default("N/A", true) }}
+</div>
+
+
+            <!-- Edit Button -->
+            <button onclick="window.location.href='{{ url_for('edit_studentinfo') }}'">Edit Information</button>
+
+            <!-- Edit Form (hidden by default) -->
+            <div id="edit-form" style="display:none;">
+                <h3>Edit Personal Information</h3>
+                <form method="POST" action="{{ url_for('edit_studentinfo') }}">
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">First Name:</div>
+                            <input type="text" name="FirstName" value="{{ student_data.personal.FirstName | default('') }}" />
+                        </div>
+                        <div class="info-field">
+                            <div class="info-label">Last Name:</div>
+                            <input type="text" name="LastName" value="{{ student_data.personal.LastName | default('') }}" />
                         </div>
                     </div>
-                </div>
+
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">Email:</div>
+                            <input type="email" name="Email" value="{{ student_data.personal.Email | default('') }}" />
+                        </div>
+                        <div class="info-field">
+                            <div class="info-label">Cellphone Number:</div>
+                            <input type="text" name="CellphoneNumber" value="{{ student_data.personal.CellphoneNumber | default('') }}" />
+                        </div>
+                    </div>
+
+                    <!-- More fields can be added as necessary -->
+
+                    <button type="submit">Update Information</button>
+                </form>
             </div>
+
         </div>
     </div>
 </body>
