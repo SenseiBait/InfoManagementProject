@@ -154,7 +154,10 @@
           {% endif %}
         {% endwith %}
 
-        <p class="message">Not registered? <a href="/register">Create an account</a></p>
+        <!-- ✅ Correct link to account registration -->
+        <p class="message">
+          Not registered? <a href="{{ url_for('account_register') }}">Create an account</a>
+        </p>
       </form>
     </div>
   </div>

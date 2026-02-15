@@ -13,7 +13,7 @@
   font-family: Arial, sans-serif;
 }
 
-/* Banner */
+/* ===== Banner ===== */
 .school-banner {
   display: flex;
   align-items: center;
@@ -24,6 +24,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  position: relative;
 }
 
 .school-banner img {
@@ -33,18 +34,31 @@
 
 .school-banner h1 {
   font-size: 1.5rem;
-  text-align: center;
   margin: 0;
+  flex: 1;
+  text-align: center;
 }
 
-/* Main container */
+.school-banner .user-info {
+  position: absolute;
+  right: 20px;
+  font-size: 0.9rem;
+  color: var(--gold);
+}
+
+.school-banner .user-info a {
+  color: var(--gold);
+  text-decoration: underline;
+  margin-left: 5px;
+}
+
+/* ===== Layout ===== */
 .main-container {
   display: flex;
   min-height: 100vh;
   background-color: var(--off-white);
 }
 
-/* Sidebar */
 .sidebar {
   width: 260px;
   background-color: var(--dark-green);
@@ -82,7 +96,6 @@
   border-left: 3px solid var(--gold);
 }
 
-/* Content */
 .content {
   flex: 1;
   padding: 40px;
@@ -93,21 +106,276 @@
   margin-bottom: 20px;
 }
 
-/* Cards */
+/* ===== Card ===== */
 .card {
   background-color: var(--white);
   border: 2px solid var(--gold);
   border-radius: 10px;
   padding: 25px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
-.card h3 {
-  color: var(--green);
+/* ===== Table Styling (shared by Enrolled Courses & Curriculum) ===== */
+.card table,
+.curriculum-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  display: block;
+  overflow-x: auto;
+}
+
+.card table th,
+.card table td,
+.curriculum-card table th,
+.curriculum-card table td {
+  border: 1px solid var(--gold);
+  padding: 12px;
+  text-align: left;
+}
+
+.card table th,
+.curriculum-card table th {
+  background-color: var(--dark-green);
+  color: var(--gold);
+}
+
+.card table tr:nth-child(even),
+.curriculum-card table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Compact column widths for Curriculum/Enrolled Courses */
+.card table th:first-child,
+.card table td:first-child,
+.curriculum-card table th:first-child,
+.curriculum-card table td:first-child {
+  width: 60px; /* Taken checkbox */
+  text-align: center;
+}
+
+.card table th:nth-child(2),
+.card table td:nth-child(2),
+.curriculum-card table th:nth-child(2),
+.curriculum-card table td:nth-child(2) {
+  width: 120px; /* Course Code */
+}
+
+.card table th:nth-child(3),
+.card table td:nth-child(3),
+.curriculum-card table th:nth-child(3),
+.curriculum-card table td:nth-child(3) {
+  width: 300px; /* Course Name */
+}
+
+.card table th:nth-child(4),
+.card table td:nth-child(4),
+.curriculum-card table th:nth-child(4),
+.curriculum-card table td:nth-child(4) {
+  width: 80px; /* Credits */
+  text-align: center;
+}
+
+/* Grades, Remarks, Instructor auto-adjust */
+.card table th:nth-child(5),
+.card table td:nth-child(5),
+.card table th:nth-child(6),
+.card table td:nth-child(6),
+.card table th:nth-child(7),
+.card table td:nth-child(7),
+.curriculum-card table th:nth-child(5),
+.curriculum-card table td:nth-child(5),
+.curriculum-card table th:nth-child(6),
+.curriculum-card table td:nth-child(6),
+.curriculum-card table th:nth-child(7),
+.curriculum-card table td:nth-child(7) {
+  min-width: 120px;
+}
+
+.center-checkbox {
+  text-align: center;
+}
+.center-checkbox input[type="checkbox"] {
+  margin: auto;
+  display: block;
+}
+
+.curriculum-card {
+  background-color: var(--white);
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.curriculum-card h3 {
+  color: var(--dark-green);
+  margin-bottom: 15px;
+}
+
+.curriculum-card .no-data {
+  text-align: center;
+  font-style: italic;
+  color: #555;
+  padding: 20px;
+}
+
+/* ===== Student Info Layout (/register) ===== */
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 40px;
+  row-gap: 8px;
   margin-bottom: 10px;
 }
 
-.card p {
+.info-field {
+  display: grid;
+  grid-template-columns: 200px auto;
+  align-items: baseline;
+}
+
+.info-label {
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+.info-value {
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Section headings in /register */
+.card h4 {
   color: var(--dark-green);
-  line-height: 1.6;
+  margin: 20px 0 10px;
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 5px;
+}
+
+/* Page-specific form rules for /register */
+.card form label {
+  display: inline-block;
+  width: 180px;
+  font-weight: bold;
+  color: var(--dark-green);
+  margin-bottom: 2px;
+  vertical-align: middle;
+}
+
+.card form input,
+.card form select {
+  width: 300px;
+  padding: 8px;
+  margin-bottom: 14px;
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  vertical-align: middle;
+}
+
+.card form button {
+  display: block;
+  margin: 30px auto 0;
+  padding: 12px 30px;
+  background-color: var(--dark-green);
+  color: var(--gold);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+}
+
+.card form button:hover {
+  background-color: var(--green);
+}
+
+/* Emergency Contact tweaks */
+.card .contact-number-row label,
+.card .contact-number-row input {
+  display: block;
+  margin-left: 180px;
+}
+.card .contact-number-row label {
+  margin-left: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .info-row {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+
+  .info-field {
+    grid-template-columns: auto;
+  }
+
+  .info-label {
+    text-align: left;
+    padding-right: 0;
+  }
+}
+
+/* ===== Account Registration Form (/accountregistration) ===== */
+.registration-card {
+  background: var(--white);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 350px;
+  margin: 40px auto;
+}
+
+.registration-card h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--dark-green);
+}
+
+.registration-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.registration-card form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--dark-green);
+}
+
+.registration-card form input {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.registration-card form button {
+  padding: 12px;
+  background-color: var(--dark-green);
+  color: var(--gold);
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.registration-card form button:hover {
+  background-color: var(--green);
+}
+
+.registration-card .message {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 12px;
+}
+
+.registration-card .message a {
+  color: var(--gold);
+  text-decoration: none;
 }

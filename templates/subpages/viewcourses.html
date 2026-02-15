@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Courses - UNIDA CHRISTIAN COLLEGES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+  <!-- Banner -->
+  <div class="school-banner">
+    <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+    <h1>UNIDA CHRISTIAN COLLEGES</h1>
+    {% if current_user.is_authenticated %}
+      <div class="user-info">
+        {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Main container -->
+  <div class="main-container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2><a href="/admindashboard" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+
+      <h2>Admin Options</h2>
+      <ul>
+        <li><a href="/viewcourses">View Courses</a></li>
+      </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <h1>View Courses</h1>
+
+      <!-- Course & Year selection card -->
+      <div class="card">
+        <h3>Filter by Course or Year</h3>
+        <form method="POST">
+          <div class="form-group">
+            <label for="course">Course:</label>
+            <select name="course" id="course">
+              <option value="">--Select Course--</option>
+              {% for course in courses %}
+                <option value="{{ course }}" {% if selected_course == course %}selected{% endif %}>{{ course }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="year">Year Level:</label>
+            <select name="year" id="year">
+              <option value="">--Select Year--</option>
+              <option value="1" {% if selected_year == "1" %}selected{% endif %}>1</option>
+              <option value="2" {% if selected_year == "2" %}selected{% endif %}>2</option>
+              <option value="3" {% if selected_year == "3" %}selected{% endif %}>3</option>
+              <option value="4" {% if selected_year == "4" %}selected{% endif %}>4</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="search">Search Student:</label>
+            <input type="text" name="search" id="search" placeholder="Enter name, email, or major" value="{{ search_query|default('') }}">
+          </div>
+
+          <button type="submit">Show Students</button>
+        </form>
+      </div>
+
+      <!-- Students Table -->
+      {% if students %}
+      <div class="card">
+        <h3>Students{% if selected_course %} in {{ selected_course }}{% endif %}{% if selected_year %} - {{ selected_year }}{% endif %}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Major</th>
+              <th>Year Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+              <tr>
+                <td>{{ s[0] }} {{ s[1] }}</td>
+                <td>{{ s[2] }}</td>
+                <td>{{ s[3] }}</td>
+                <td>{{ s[4] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</body>
+</html>
