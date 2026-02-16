@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account Registration - UNIDA CHRISTIAN COLLEGES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+<div class="school-banner">
+  <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+  <h1>UNIDA CHRISTIAN COLLEGES</h1>
+</div>
+
+<div class="main-container">
+  <div class="content">
+    <div class="registration-card">
+      <h3>Create Account</h3>
+      <form method="POST" action="{{ url_for('account_register') }}">
+        <label>Email (Username):</label>
+        <input type="email" name="email" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
+        <label>Confirm Password:</label>
+        <input type="password" name="confirm_password" required>
+
+        <button type="submit">Register Account</button>
+      </form>
+
+      <p class="message">
+        Already have an account? <a href="{{ url_for('login') }}">Back to Login</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

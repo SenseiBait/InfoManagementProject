@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Student Information - UNIDA CHRISTIAN COLLEGES</title>
+  <title>Enrolled Courses - UNIDA CHRISTIAN COLLEGES</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
@@ -11,8 +11,6 @@
 <div class="school-banner">
   <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
   <h1>UNIDA CHRISTIAN COLLEGES</h1>
-
-  <!-- User info on the right -->
   {% if current_user.is_authenticated %}
   <div class="user-info">
     {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
@@ -20,34 +18,70 @@
   {% endif %}
 </div>
 
-  <!-- Main container (Sidebar + Content) -->
-  <div class="main-container">
-    <div class="sidebar">
-      <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+<!-- Main container (Sidebar + Content) -->
+<div class="main-container">
+  <div class="sidebar">
+    <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
 
-      <h2>Student Information</h2>
-      <ul>
-        <li><a href="/studentinfo">Student Information</a></li>
-        <li><a href="/schoolhistory">School History</a></li>
-        <li><a href="/form137">Grade History (Form 137)</a></li>
-      </ul>
+    <h2>Student Information</h2>
+    <ul>
+      <li><a href="/studentinfo">Student Information</a></li>
+      <li><a href="/schoolhistory">School History</a></li>
+      <li><a href="/form137">Grade History (Form 137)</a></li>
+    </ul>
 
-      <h2>Academic Performance</h2>
-      <ul>
-        <li><a href="/curriculum">Curriculum</a></li>
-        <li><a href="/grades" class="active">Grades</a></li>
-        <li><a href="/courses">Enrolled Courses</a></li>
-      </ul>
-    </div>
+    <h2>Academic Performance</h2>
+    <ul>
+      <li><a href="/curriculum">Curriculum</a></li>
+      <li><a href="/grades">Grades</a></li>
+      <li><a href="/courses" class="active">Enrolled Courses</a></li>
+    </ul>
+  </div>
 
-    <div class="content">
-      <!-- Editable cards -->
-      <div class="card">
-        <h3>Grades</h3>
-        <p>Here you can display all the details of the student's grades. Edit this card for content specific to this page.</p>
-      </div>
+  <div class="content">
+    <!-- Courses Table -->
+    <div class="card enrolled-courses">
+      <h3>Enrolled Courses</h3>
+      <p>Courses enrolled for the selected program, year, and semester.</p>
+      
+      <!-- Table to display the courses data -->
+      <table>
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Credits</th>
+            <th>Year Level</th>
+            <th>Semester</th>
+            <th>Grades</th>
+            <th>Remarks</th>
+            <th>Instructor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if courses %}
+            {% for course in courses %}
+              <tr>
+                <td>{{ course.CourseCode }}</td>
+                <td>{{ course.CourseName }}</td>
+                <td>{{ course.Credits }}</td>
+                <td>{{ course.YearLevel }}</td>
+                <td>{{ course.Semester }}</td>
+                <td>{{ course.Grades }}</td>
+                <td>{{ course.Remarks }}</td>
+                <td>{{ course.Instructor }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" style="text-align: center;">No enrolled courses available for this program, year, and semester.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
 
 </body>
 </html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Student Information - UNIDA CHRISTIAN COLLEGES</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <meta charset="UTF-8">
+    <title>Curriculum - UNIDA CHRISTIAN COLLEGES</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
 
@@ -11,8 +11,6 @@
 <div class="school-banner">
   <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
   <h1>UNIDA CHRISTIAN COLLEGES</h1>
-
-  <!-- User info on the right -->
   {% if current_user.is_authenticated %}
   <div class="user-info">
     {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
@@ -20,34 +18,77 @@
   {% endif %}
 </div>
 
-  <!-- Main container (Sidebar + Content) -->
-  <div class="main-container">
-    <div class="sidebar">
-      <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+<!-- Main container -->
+<div class="main-container">
+  <div class="sidebar">
+    <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+    <h2>Student Information</h2>
+    <ul>
+      <li><a href="/studentinfo">Student Information</a></li>
+      <li><a href="/schoolhistory">School History</a></li>
+      <li><a href="/form137">Grade History (Form 137)</a></li>
+    </ul>
+    <h2>Academic Performance</h2>
+    <ul>
+      <li><a href="/curriculum" class="active">Curriculum</a></li>
+      <li><a href="/grades">Grades</a></li>
+      <li><a href="/courses">Enrolled Courses</a></li>
+    </ul>
+  </div>
 
-      <h2>Student Information</h2>
-      <ul>
-        <li><a href="/studentinfo">Student Information</a></li>
-        <li><a href="/schoolhistory">School History</a></li>
-        <li><a href="/form137">Grade History (Form 137)</a></li>
-      </ul>
+  <div class="content">
+    <div class="card curriculum-card">
+      <h3>Curriculum</h3>
+      <p>Complete curriculum for your program, organized by year and semester.</p>
 
-      <h2>Academic Performance</h2>
-      <ul>
-        <li><a href="/curriculum" class="active">Curriculum</a></li>
-        <li><a href="/grades">Grades</a></li>
-        <li><a href="/courses">Enrolled Courses</a></li>
-      </ul>
-    </div>
-
-    <div class="content">
-      <!-- Editable cards -->
-      <div class="card">
-        <h3>Curriculum</h3>
-        <p>Here you can display all the details of the curriculum. Edit this card for content specific to this page.</p>
-      </div>
+      {% if curriculum %}
+        {% for year_sem, courses in curriculum.items() %}
+          <h4>{{ year_sem }}</h4>
+          <table>
+            <colgroup>
+              <col style="width:60px;">  <!-- Checkbox -->
+              <col style="width:120px;"> <!-- Course Code -->
+              <col style="width:200px;"> <!-- Course Name -->
+              <col style="width:80px;">  <!-- Credits -->
+              <col style="width:100px;"> <!-- Grades -->
+              <col style="width:150px;"> <!-- Remarks -->
+              <col style="width:200px;"> <!-- Instructor -->
+            </colgroup>
+            <thead>
+              <tr>
+                <th style="text-align:center;">Taken</th>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Credits</th>
+                <th>Grades</th>
+                <th>Remarks</th>
+                <th>Instructor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for course in courses %}
+                <tr>
+                  <td class="center-checkbox">
+                    <!-- Disabled for students (read-only) -->
+                    <input type="checkbox" name="selected_courses" value="{{ course.CourseCode }}" disabled>
+                  </td>
+                  <td>{{ course.CourseCode }}</td>
+                  <td>{{ course.CourseName }}</td>
+                  <td>{{ course.Credits }}</td>
+                  <td>{{ course.Grades }}</td>
+                  <td>{{ course.Remarks }}</td>
+                  <td>{{ course.Instructor }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endfor %}
+      {% else %}
+        <p style="text-align:center;">No curriculum available for your program.</p>
+      {% endif %}
     </div>
   </div>
+</div>
 
 </body>
 </html>

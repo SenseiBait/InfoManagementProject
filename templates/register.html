@@ -1,170 +1,243 @@
-{% extends "base.html" %}
-{% block content %}
-<style>
-:root {
-  --dark-green: #1E4D2B;
-  --green: #145c34;
-  --gold: #FFD700;
-  --white: #ffffff;
-  --off-white: #fdfdfd;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - UNIDA CHRISTIAN COLLEGES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
 
-body {
-  background: linear-gradient(90deg, var(--dark-green) 0%, var(--green) 100%);
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-}
+<div class="school-banner">
+  <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+  <h1>UNIDA CHRISTIAN COLLEGES</h1>
+  {% if current_user.is_authenticated %}
+  <div class="user-info">
+    {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+  {% endif %}
+</div>
 
-.register-container {
-  width: 400px;
-  margin: 50px auto;
-}
-
-.register-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.register-header h1 {
-  color: var(--gold);
-  margin-bottom: 5px;
-}
-
-.register-header span {
-  color: var(--white);
-  font-size: 14px;
-}
-
-.register-card {
-  background-color: var(--white);
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-  text-align: center;
-}
-
-/* FLOATING LABEL INPUTS */
-.input-container {
-  position: relative;
-  width: 90%;
-  margin: 0 auto 20px;
-}
-
-.input-container input {
-  width: 100%;
-  padding: 15px 10px 15px 10px;
-  border: 1px solid var(--green);
-  border-radius: 5px;
-  font-size: 14px;
-  outline: none;
-  box-sizing: border-box;
-  background: none;
-}
-
-.input-container label {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999;
-  font-size: 14px;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.input-container input:focus + label,
-.input-container input:not(:placeholder-shown) + label {
-  top: 0px; /* Adjust the floating label height here */
-  font-size: 12px;
-  color: var(--dark-green);
-  background: var(--white);
-  padding: 0 4px;
-}
-
-/* BUTTON */
-.register-card button {
-  display: block;
-  width: 90%;
-  margin: 0 auto;
-  padding: 15px;
-  background-color: var(--dark-green);
-  color: var(--gold);
-  border: 0;
-  border-radius: 5px;
-  font-size: 14px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.register-card button:hover {
-  background-color: var(--green);
-}
-
-.register-card .message {
-  margin-top: 15px;
-  font-size: 12px;
-  color: var(--dark-green);
-}
-
-.register-card .message a {
-  color: var(--gold);
-  text-decoration: none;
-}
-</style>
-
-<div class="register-container">
-  <div class="register-header">
-    <h1>UNIDA CHRISTIAN COLLEGES</h1>
-    <span>Create your account</span>
+<div class="main-container">
+  <div class="sidebar">
+    <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+    <h2>Student Information</h2>
+    <ul>
+      <li><a href="/studentinfo">Student Information</a></li>
+      <li><a href="/schoolhistory">School History</a></li>
+      <li><a href="/form137">Grade History (Form 137)</a></li>
+    </ul>
+    <h2>Academic Performance</h2>
+    <ul>
+      <li><a href="/curriculum">Curriculum</a></li>
+      <li><a href="/grades">Grades</a></li>
+      <li><a href="/courses">Enrolled Courses</a></li>
+    </ul>
   </div>
 
-  <div class="register-card">
-    <form method="POST">
-      <div class="input-container">
-        <input type="text" name="firstname" placeholder=" " required>
-        <label>First Name</label>
-      </div>
+  <div class="content">
+    <div class="card">
+      <h3>Create Account</h3><br>
+      <form method="POST" action="{{ url_for('register') }}">
+        
+        <!-- Account Info -->
+        <h4>Account Information</h4>
+        <label>Username (Email):</label>
+        <input type="text" name="username" value="{{ username }}" readonly>
 
-      <div class="input-container">
-        <input type="text" name="lastname" placeholder=" " required>
-        <label>Last Name</label>
-      </div>
+        <label>Password:</label>
+        <input type="password" name="password" value="{{ masked_password }}" readonly><br><br>
 
-      <div class="input-container">
-        <input type="email" name="email" placeholder=" " required>
-        <label>Email</label>
-      </div>
+ <h4>Personal Information</h4>
 
-      <div class="input-container">
-        <input type="text" name="yearlevel" placeholder=" " required>
-        <label>Year Level</label>
-      </div>
+<label>First Name:</label>
+<input type="text" name="FirstName" required>
 
-      <div class="input-container">
-        <input type="text" name="major" placeholder=" " required>
-        <label>Major</label>
-      </div>
+<label>Last Name:</label>
+<input type="text" name="LastName" required>
 
-      <div class="input-container">
-        <input type="password" name="password" placeholder=" " required>
-        <label>Password</label>
-      </div>
+<label>Program:</label>
+<select name="Program" required>
+  <option value="">-- Select Program --</option>
+  <option value="1">BSCS</option>
+  <option value="2">ACT</option>
+  <option value="3">BAOM</option>
+  <option value="4">BAHRM</option>
+  <option value="5">BEED</option>
+  <option value="6">BSED SOC</option>
+  <option value="7">BSED VAL</option>
+  <option value="8">BSED ENG</option>
+</select>
 
-      <button type="submit">Register</button>
+<label>Year Level:</label>
+<select name="YearLevel" required>
+  <option value="">-- Select Year Level --</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+</select>
 
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <p class="message">{{ messages[0] }}</p>
-        {% endif %}
-      {% endwith %}
+<label>Semester:</label>
+<select name="Semester" required>
+  <option value="">-- Select Semester --</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+</select>
 
-      <p class="message">Already have an account? <a href="/login">Login</a></p>
-    </form>
+<label>Status:</label>
+<select name="Status" required>
+  <option value="Regular">Regular</option>
+  <option value="Irregular">Irregular</option>
+</select>
+
+<label>Student Number:</label>
+<input type="text" name="StudentNumber">
+
+<label>Birthday:</label>
+<input type="date" id="birthday" name="Birthday" required>
+
+<label>Age:</label>
+<!-- ✅ Age is now read-only, updated live by JS -->
+<input type="number" id="age" name="Age" readonly>
+
+<label>Birthplace:</label>
+<input type="text" name="Birthplace">
+
+<label>Sex:</label>
+<select name="Sex" required>
+  <option value="">-- Select Sex --</option>
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+</select>
+
+<label>Cellphone Number:</label>
+<input type="text" name="CellphoneNumber">
+
+<label>Email:</label>
+<input type="email" name="Email" value="{{ current_user.email }}" readonly>
+
+<label>Civil Status:</label>
+<select name="CivilStatus" required>
+  <option value="">-- Select Civil Status --</option>
+  <option value="Single">Single</option>
+  <option value="Married">Married</option>
+  <option value="Widowed">Widowed</option>
+  <option value="Separated">Separated</option>
+</select>
+
+<label>Nationality:</label>
+<input type="text" name="Nationality">
+
+<label>Religion:</label>
+<input type="text" name="Religion"><br><br>
+
+        <!-- Address Info -->
+      <h4>Address Information</h4>
+
+      <label>House Number:</label>
+      <input type="text" name="HouseNumber">
+
+      <label>Street:</label>
+      <input type="text" name="Street">
+
+      <label>Village:</label>
+      <input type="text" name="Village">
+
+      <label>Barangay:</label>
+      <input type="text" name="Barangay">
+
+      <label>City:</label>
+      <input type="text" name="City">
+
+      <label>Province:</label>
+      <input type="text" name="Province">
+
+      <label>Zip Code:</label>
+      <input type="text" name="ZIPCode">
+
+      <label>Telephone/Mobile:</label>
+      <input type="text" name="TelephoneMobileNumber"><br><br>
+
+<!-- Emergency Contact -->
+<h4>Emergency Contact</h4>
+<div class="emergency-contact">
+  <label>Contact Person:</label>
+  <input type="text" name="ContactPerson">
+
+  <div class="contact-number-row">
+    <label>Contact Number:</label>
+    <input type="text" name="ContactNumber">
+  </div>
+
+  <label>Relation:</label>
+  <input type="text" name="Relation">
+
+  <div class="checkbox-row">
+    <label for="sameAddress">Use my student address as emergency contact address</label>
+    <input type="checkbox" id="sameAddress" name="SameAddress" checked>
+  </div>
+
+  <div id="emergencyAddressFields" style="display:none;">
+    <label>House Number:</label>
+    <input type="text" name="EmergencyHouseNumber">
+
+    <label>Street:</label>
+    <input type="text" name="EmergencyStreet">
+
+    <label>Village:</label>
+    <input type="text" name="EmergencyVillage">
+
+    <label>Barangay:</label>
+    <input type="text" name="EmergencyBarangay">
+
+    <label>City:</label>
+    <input type="text" name="EmergencyCity">
+
+    <label>Province:</label>
+    <input type="text" name="EmergencyProvince">
+
+    <label>Zip Code:</label>
+    <input type="text" name="EmergencyZIPCode">
+
+    <label>Telephone/Mobile:</label>
+    <input type="text" name="EmergencyTelephoneMobileNumber">
   </div>
 </div>
-{% endblock %}
+
+        <button type="submit" class="btn btn-update">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const checkbox = document.getElementById('sameAddress');
+  const emergencyFields = document.getElementById('emergencyAddressFields');
+
+  checkbox.addEventListener('change', function() {
+    emergencyFields.style.display = this.checked ? 'none' : 'block';
+  });
+
+  // ✅ Auto-calculate Age from Birthday
+  const birthdayInput = document.getElementById('birthday');
+  const ageInput = document.getElementById('age');
+
+  birthdayInput.addEventListener('change', function() {
+    const bday = new Date(this.value);
+    if (!isNaN(bday)) {
+      const today = new Date();
+      let age = today.getFullYear() - bday.getFullYear();
+      const m = today.getMonth() - bday.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < bday.getDate())) {
+        age--;
+      }
+      ageInput.value = age;
+    } else {
+      ageInput.value = '';
+    }
+  });
+</script>
+
+
+</body>
+</html>

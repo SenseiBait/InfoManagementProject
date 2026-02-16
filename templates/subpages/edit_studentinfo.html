@@ -1,0 +1,319 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Student Information - UNIDA CHRISTIAN COLLEGES</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <!-- Banner -->
+    <div class="school-banner">
+        <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+        <h1>UNIDA CHRISTIAN COLLEGES</h1>
+        {% if current_user.is_authenticated %}
+        <div class="user-info">
+            {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Main container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+            <h2>Student Information</h2>
+            <ul>
+                <li><a href="/studentinfo" class="active">Student Information</a></li>
+                <li><a href="/schoolhistory">School History</a></li>
+                <li><a href="/form137">Grade History (Form 137)</a></li>
+            </ul>
+            <h2>Academic Performance</h2>
+            <ul>
+                <li><a href="/curriculum">Curriculum</a></li>
+                <li><a href="/grades">Grades</a></li>
+                <li><a href="/courses">Enrolled Courses</a></li>
+            </ul>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="card">
+                <h1>Edit Student Information</h1>
+
+                <!-- Registration Form with pre-filled data -->
+                <form method="POST" action="{{ url_for('edit_studentinfo') }}">
+                    
+<h4>Personal Information</h4>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">First Name:</div>
+        <div class="info-value">
+            <input type="text" name="FirstName" value="{{ student_data.personal.FirstName }}">
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Last Name:</div>
+        <div class="info-value">
+            <input type="text" name="LastName" value="{{ student_data.personal.LastName }}">
+        </div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Program:</div>
+        <div class="info-value">
+            <select name="Program">
+                <option value="1" {% if student_data.personal.Program == "BSCS" %}selected{% endif %}>BSCS</option>
+                <option value="2" {% if student_data.personal.Program == "ACT" %}selected{% endif %}>ACT</option>
+                <option value="3" {% if student_data.personal.Program == "BAOM" %}selected{% endif %}>BAOM</option>
+                <option value="4" {% if student_data.personal.Program == "BAHRM" %}selected{% endif %}>BAHRM</option>
+                <option value="5" {% if student_data.personal.Program == "BEED" %}selected{% endif %}>BEED</option>
+                <option value="6" {% if student_data.personal.Program == "BSED SOC" %}selected{% endif %}>BSED SOC</option>
+                <option value="7" {% if student_data.personal.Program == "BSED VAL" %}selected{% endif %}>BSED VAL</option>
+                <option value="8" {% if student_data.personal.Program == "BSED ENG" %}selected{% endif %}>BSED ENG</option>
+            </select>
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Year Level:</div>
+        <div class="info-value">
+            <select name="YearLevel">
+                <option value="1" {% if student_data.personal.YearLevel == 1 %}selected{% endif %}>1st Year</option>
+                <option value="2" {% if student_data.personal.YearLevel == 2 %}selected{% endif %}>2nd Year</option>
+                <option value="3" {% if student_data.personal.YearLevel == 3 %}selected{% endif %}>3rd Year</option>
+                <option value="4" {% if student_data.personal.YearLevel == 4 %}selected{% endif %}>4th Year</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Semester:</div>
+        <div class="info-value">
+            <select name="Semester">
+                <option value="1" {% if student_data.personal.Semester == 1 %}selected{% endif %}>1st Semester</option>
+                <option value="2" {% if student_data.personal.Semester == 2 %}selected{% endif %}>2nd Semester</option>
+            </select>
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Status:</div>
+        <div class="info-value">
+            <input type="text" name="Status" value="{{ student_data.personal.Status }}">
+        </div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Student Number:</div>
+        <div class="info-value">
+            <input type="text" name="StudentNumber" value="{{ student_data.personal.StudentNumber }}">
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Birthday:</div>
+        <div class="info-value">
+            <input type="date" id="birthday" name="Birthday" value="{{ student_data.personal.Birthday }}">
+        </div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Age:</div>
+        <div class="info-value">
+            <!-- ✅ Age is now read-only, updated live by JS -->
+            <input type="number" id="age" name="Age" value="{{ student_data.personal.Age }}" readonly>
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Birthplace:</div>
+        <div class="info-value">
+            <input type="text" name="Birthplace" value="{{ student_data.personal.Birthplace }}">
+        </div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Sex:</div>
+        <div class="info-value">
+            <select name="Sex">
+                <option value="Male" {% if student_data.personal.Sex == "Male" %}selected{% endif %}>Male</option>
+                <option value="Female" {% if student_data.personal.Sex == "Female" %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Cellphone Number:</div>
+        <div class="info-value">
+            <input type="text" name="CellphoneNumber" value="{{ student_data.personal.CellphoneNumber }}">
+        </div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Email:</div>
+        <div class="info-value">
+            <input type="email" name="Email" value="{{ student_data.personal.Email }}">
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Civil Status:</div>
+        <div class="info-value">
+            <select name="CivilStatus">
+                <option value="Single" {% if student_data.personal.CivilStatus == "Single" %}selected{% endif %}>Single</option>
+                <option value="Married" {% if student_data.personal.CivilStatus == "Married" %}selected{% endif %}>Married</option>
+                <option value="Widowed" {% if student_data.personal.CivilStatus == "Widowed" %}selected{% endif %}>Widowed</option>
+                <option value="Separated" {% if student_data.personal.CivilStatus == "Separated" %}selected{% endif %}>Separated</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-field">
+        <div class="info-label">Nationality:</div>
+        <div class="info-value">
+            <input type="text" name="Nationality" value="{{ student_data.personal.Nationality }}">
+        </div>
+    </div>
+    <div class="info-field">
+        <div class="info-label">Religion:</div>
+        <div class="info-value">
+            <input type="text" name="Religion" value="{{ student_data.personal.Religion }}">
+        </div>
+    </div>
+</div>
+
+                    <h4>Address Information</h4>
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">House Number:</div>
+                            <div class="info-value">
+                                <input type="text" name="HouseNumber" value="{{ student_data.address.HouseNumber }}">
+                            </div>
+                        </div>
+                        <div class="info-field">
+                            <div class="info-label">Street:</div>
+                            <div class="info-value">
+                                <input type="text" name="Street" value="{{ student_data.address.Street }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">Village:</div>
+                            <div class="info-value">
+                                <input type="text" name="Village" value="{{ student_data.address.Village }}">
+                            </div>
+                        </div>
+                        <div class="info-field">
+                            <div class="info-label">Barangay:</div>
+                            <div class="info-value">
+                                <input type="text" name="Barangay" value="{{ student_data.address.Barangay }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">City:</div>
+                            <div class="info-value">
+                                <input type="text" name="City" value="{{ student_data.address.City }}">
+                            </div>
+                        </div>
+                        <div class="info-field">
+                            <div class="info-label">Province:</div>
+                            <div class="info-value">
+                                <input type="text" name="Province" value="{{ student_data.address.Province }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">Zip Code:</div>
+                            <div class="info-value">
+                                <input type="text" name="ZIPCode" value="{{ student_data.address.ZIPCode }}">
+                            </div>
+                        </div>
+                        <div class="info-field">
+                            <div class="info-label">Telephone/Mobile:</div>
+                            <div class="info-value">
+                                <input type="text" name="TelephoneMobileNumber" value="{{ student_data.address.TelephoneMobileNumber }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4>Emergency Contact</h4>
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">Contact Person:</div>
+                            <div class="info-value">
+                                <input type="text" name="ContactPerson" value="{{ student_data.emergency.ContactPerson }}">
+                            </div>
+                        </div>
+                        <div class="info-field">
+                            <div class="info-label">Contact Number:</div>
+                            <div class="info-value">
+                                <input type="text" name="ContactNumber" value="{{ student_data.emergency.ContactNumber }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">Relation:</div>
+                            <div class="info-value">
+                                <input type="text" name="Relation" value="{{ student_data.emergency.Relation }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-field">
+                            <div class="info-label">Address:</div>
+                            <div class="info-value">
+                                <input type="text" name="EmergencyAddress" value="{{ student_data.emergency.Address }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-update">Update Information</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+  // ✅ Auto-calculate Age from Birthday
+  const birthdayInput = document.getElementById('birthday');
+  const ageInput = document.getElementById('age');
+
+  birthdayInput.addEventListener('change', function() {
+    const bday = new Date(this.value);
+    if (!isNaN(bday)) {
+      const today = new Date();
+      let age = today.getFullYear() - bday.getFullYear();
+      const m = today.getMonth() - bday.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < bday.getDate())) {
+        age--;
+      }
+      ageInput.value = age;
+    } else {
+      ageInput.value = '';
+    }
+  });
+</script>
+
+
+</body>
+</html>

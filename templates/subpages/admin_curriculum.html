@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Curriculum - UNIDA CHRISTIAN COLLEGES</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+</head>
+<body>
+
+<!-- Banner -->
+<div class="school-banner">
+  <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+  <h1>UNIDA CHRISTIAN COLLEGES</h1>
+  {% if current_user.is_authenticated %}
+  <div class="user-info">
+    {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2><a href="/admindashboard" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+  <h2>Admin Options</h2>
+  <ul>
+    <li><a href="/viewcourses">View Courses</a></li>
+    <li><a href="/admin_curriculum/{{ student[0] }}" class="active">Manage Curriculum</a></li>
+  </ul>
+</div>
+
+<div class="content">
+  <div class="card curriculum-card">
+    <h3>Manage Curriculum</h3>
+{% set program_map = {
+    1: "BSCS",
+    2: "ACT",
+    3: "BAOM",
+    4: "BAHRM",
+    5: "BEED",
+    6: "BSED SOC",
+    7: "BSED VAL",
+    8: "BSED ENG"
+} %}
+
+{% set semester_map = {
+    1: "1st Semester",
+    2: "2nd Semester"
+} %}
+
+{% set year_map = {
+    1: "1st Year",
+    2: "2nd Year",
+    3: "3rd Year",
+    4: "4th Year"
+} %}
+
+<p>
+  Edit curriculum for {{ student[1] }} {{ student[2] }}
+  (Program: {{ program_map.get(student[3], student[3]) }},
+   Year: {{ year_map.get(student[4], student[4]) }},
+   Semester: {{ semester_map.get(student[5]|int, student[5]) }})
+</p>
+
+    {% if curriculum %}
+      <form method="POST" action="{{ url_for('update_curriculum', student_id=student[0]) }}">
+        {% for year_sem, courses in curriculum.items() %}
+          <h4>{{ year_sem }}</h4>
+          <table>
+            <colgroup>
+              <col style="width:60px;">   <!-- Taken -->
+              <col style="width:120px;"> <!-- Course Code -->
+              <col style="width:250px;"> <!-- Course Name -->
+              <col style="width:80px;">  <!-- Credits -->
+              <col style="width:100px;"> <!-- Grade -->
+              <col style="width:150px;"> <!-- Remarks -->
+              <col style="width:200px;"> <!-- Instructor -->
+            </colgroup>
+            <thead>
+              <tr>
+                <th style="text-align:center;">Taken</th>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Credits</th>
+                <th>Grade</th>
+                <th>Remarks</th>
+                <th>Instructor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in courses %}
+                <tr>
+                  <td class="center-checkbox">
+                    <input type="checkbox" name="status_{{ c.CourseID }}" value="Taken"
+                           {% if c.Status == 'Taken' %}checked{% endif %}>
+                  </td>
+                  <td>{{ c.CourseCode }}</td>
+                  <td>{{ c.CourseName }}</td>
+                  <td>{{ c.Credits }}</td>
+                  <td><input type="text" name="grade_{{ c.CourseID }}" value="{{ c.Grade if c.Grade else '' }}"></td>
+                  <td><input type="text" name="remarks_{{ c.CourseID }}" value="{{ c.Remarks if c.Remarks else '' }}"></td>
+                  <td><input type="text" name="instructor_{{ c.CourseID }}" value="{{ c.Instructor if c.Instructor else '' }}"></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endfor %}
+        <button type="submit" class="btn btn-update">Save Changes</button>
+      </form>
+    {% else %}
+      <p style="text-align:center;">No curriculum records found for this student.</p>
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>

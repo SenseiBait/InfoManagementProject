@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Courses - UNIDA CHRISTIAN COLLEGES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+  <!-- Banner -->
+  <div class="school-banner">
+    <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+    <h1>UNIDA CHRISTIAN COLLEGES</h1>
+    {% if current_user.is_authenticated %}
+      <div class="user-info">
+        {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Main container -->
+  <div class="main-container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2><a href="/admindashboard" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+
+      <h2>Admin Options</h2>
+      <ul>
+        <li><a href="/viewcourses">View Courses</a></li>
+      </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <h1>View Courses</h1>
+
+      <!-- Filter form -->
+      <div class="card">
+        <h3>Filter by Program or Year</h3>
+        <form method="POST">
+          <div class="form-group">
+            <label for="course">Program:</label>
+            <input type="text" name="course" id="course" placeholder="Enter program code or name" value="{{ selected_course|default('') }}">
+          </div>
+
+          <div class="form-group">
+            <label for="year">Year Level:</label>
+            <input type="text" name="year" id="year" placeholder="Enter year level" value="{{ selected_year|default('') }}">
+          </div>
+
+          <div class="form-group">
+            <label for="search">Search Student:</label>
+            <input type="text" name="search" id="search" placeholder="Enter name or email" value="{{ search_query|default('') }}">
+          </div>
+
+          <button type="submit" class="btn-update">Show Students</button>
+        </form>
+      </div>
+
+      <!-- Students Table -->
+      {% if students %}
+      <div class="card student-list">
+        <h3>Students{% if selected_course %} in {{ selected_course }}{% endif %}{% if selected_year %} - Year {{ selected_year }}{% endif %}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Program</th>
+              <th>Year Level</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+              <tr>
+                <td>{{ s[1] }} {{ s[2] }}</td>
+                <td>{{ s[3] }}</td>
+                <td>
+                  {% if s[4]|string == "1" %}BSCS
+                  {% elif s[4]|string == "2" %}ACT
+                  {% elif s[4]|string == "3" %}BAOM
+                  {% elif s[4]|string == "4" %}BAHRM
+                  {% elif s[4]|string == "5" %}BEED
+                  {% elif s[4]|string == "6" %}BSED SOC
+                  {% elif s[4]|string == "7" %}BSED VAL
+                  {% elif s[4]|string == "8" %}BSED ENG
+                  {% else %}Unknown{% endif %}
+                </td>
+                <td>
+                  {% if s[5]|string == "1" %}1st Year
+                  {% elif s[5]|string == "2" %}2nd Year
+                  {% elif s[5]|string == "3" %}3rd Year
+                  {% elif s[5]|string == "4" %}4th Year
+                  {% else %}Unknown{% endif %}
+                </td>
+                <td>
+                  {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_curriculum', student_id=s[0]) }}" class="btn btn-update">
+                        Manage Curriculum
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</body>
+</html>
