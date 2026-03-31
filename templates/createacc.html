@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account Registration - UNIDA CHRISTIAN COLLEGES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+  <!-- Banner -->
+  <div class="school-banner">
+    <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
+    <h1>UNIDA CHRISTIAN COLLEGES</h1>
+
+    <!-- User info on the right -->
+    {% if current_user.is_authenticated %}
+    <div class="user-info">
+      {{ current_user.username }} | <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Main container (Sidebar + Content) -->
+  <div class="main-container">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2><a href="/admin" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2> <!-- Updated link -->
+    <h2>Admin Options</h2>
+    <ul>
+      <li><a href="/createaccount">Create Account</a></li>
+      <li><a href="/viewcourses">View Courses</a></li>
+    </ul>
+  </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <div class="registration-card">
+        <h3>Create Account</h3>
+        <form method="POST" action="{{ url_for('create_account') }}">
+          <label>Student Number:</label>
+          <input type="text" name="student_number" required>
+
+          <label>Username:</label>
+          <input type="text" name="username" >
+
+          <label>Password:</label>
+          <input type="password" name="password" required>
+
+          <label>Confirm Password:</label>
+          <input type="password" name="confirm_password" required>
+
+          <button type="submit">Register Account</button>
+        </form>
+      </div>
+    </div>
+
+  </div> <!-- End of main-container -->
+
+</body>
+</html>

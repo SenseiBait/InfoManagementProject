@@ -34,10 +34,12 @@
 
     .login-header h1 {
       color: var(--gold);
-      margin-bottom: 5px;
+      margin: 0 0 5px 0; /* gold title on top */
+      font-size: 1.5rem;
     }
 
     .login-header span {
+      display: block;       /* force onto its own line */
       color: var(--white);
       font-size: 14px;
     }
@@ -124,6 +126,18 @@
       0% { transform: translateY(50px); opacity: 0; }
       100% { transform: translateY(0); opacity: 1; }
     }
+
+        /* Hide number input spinners in Chrome, Safari, Edge */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Hide number input spinners in Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
   </style>
 </head>
 <body>
@@ -134,29 +148,27 @@
       <span>Enter your credentials to access your account</span>
     </div>
 
-    <div class="login-card">
-      <form method="POST" class="login-form">
-        <div class="input-container">
-          <input type="email" name="email" placeholder=" " required>
-          <label>Email</label>
-        </div>
+  <div class="login-card">
+    <form method="POST" action="/login" class="login-form">
+      <div class="input-container">
+        <input type="number" name="student_number" placeholder=" " required>
+        <label>Student Number</label>
+      </div>
 
-        <div class="input-container">
-          <input type="password" name="password" placeholder=" " required>
-          <label>Password</label>
-        </div>
+      <div class="input-container">
+        <input type="password" name="password" placeholder=" " required>
+        <label>Password</label>
+      </div>
 
-        <button type="submit">Login</button>
+      <button type="submit">Login</button>
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <p class="message">{{ messages[0] }}</p>
-          {% endif %}
-        {% endwith %}
-
-        <p class="message">Not registered? <a href="/register">Create an account</a></p>
-      </form>
-    </div>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <p class="message">{{ messages[0] }}</p>
+        {% endif %}
+      {% endwith %}
+    </form>
+  </div>
   </div>
 
 </body>

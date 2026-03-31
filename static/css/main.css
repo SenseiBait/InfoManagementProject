@@ -13,7 +13,7 @@
   font-family: Arial, sans-serif;
 }
 
-/* Banner */
+/* ===== Banner ===== */
 .school-banner {
   display: flex;
   align-items: center;
@@ -21,9 +21,9 @@
   background-color: var(--dark-green);
   color: var(--gold);
   padding: 10px 20px;
-  position: sticky;
+  position: sticky;   /* stays at top when scrolling */
   top: 0;
-  z-index: 1000;
+  z-index: 1000;      /* ensures it stays above sidebar/content */
 }
 
 .school-banner img {
@@ -33,24 +33,47 @@
 
 .school-banner h1 {
   font-size: 1.5rem;
-  text-align: center;
   margin: 0;
+  flex: 1;
+  text-align: center;
 }
 
-/* Main container */
+.school-banner .user-info {
+  position: absolute;
+  right: 20px;
+  font-size: 0.9rem;
+  color: var(--gold);
+}
+
+.school-banner .user-info a {
+  color: var(--gold);
+  text-decoration: underline;
+  margin-left: 5px;
+}
+
+/* ===== Layout ===== */
 .main-container {
   display: flex;
   min-height: 100vh;
   background-color: var(--off-white);
 }
 
-/* Sidebar */
 .sidebar {
   width: 260px;
   background-color: var(--dark-green);
   color: var(--white);
   padding: 25px;
   flex-shrink: 0;
+
+  /* ✅ Fixed sidebar aligned with banner */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;        /* full viewport height */
+  overflow-y: auto;     /* scroll inside if content is taller */
+
+  /* Push content down so it doesn’t overlap banner */
+  padding-top: 60px;    /* adjust to match banner height */
 }
 
 .sidebar h2 {
@@ -82,10 +105,10 @@
   border-left: 3px solid var(--gold);
 }
 
-/* Content */
 .content {
   flex: 1;
   padding: 40px;
+  margin-left: 260px;   /* offset for fixed sidebar */
 }
 
 .content h1 {
@@ -93,21 +116,334 @@
   margin-bottom: 20px;
 }
 
-/* Cards */
+/* ===== Card ===== */
 .card {
   background-color: var(--white);
   border: 2px solid var(--gold);
   border-radius: 10px;
   padding: 25px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
-.card h3 {
-  color: var(--green);
+/* ===== Enrolled Courses Table ===== */
+.card.enrolled-courses table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  display: block;
+  overflow-x: auto;
+}
+
+.card.enrolled-courses th,
+.card.enrolled-courses td {
+  border: 1px solid var(--gold);
+  padding: 10px;
+  text-align: left;
+}
+
+.card.enrolled-courses th {
+  background-color: var(--dark-green);
+  color: var(--gold);
+  font-weight: bold;
+}
+
+/* Compact numeric columns */
+.card.enrolled-courses th:nth-child(3),
+.card.enrolled-courses td:nth-child(3), /* Credits */
+.card.enrolled-courses th:nth-child(4),
+.card.enrolled-courses td:nth-child(4), /* Year Level */
+.card.enrolled-courses th:nth-child(5),
+.card.enrolled-courses td:nth-child(5)  /* Semester */ {
+  width: 80px;
+  text-align: center;
+}
+
+/* Text-heavy columns expand */
+.card.enrolled-courses th:nth-child(2),
+.card.enrolled-courses td:nth-child(2), /* Course Name */
+.card.enrolled-courses th:nth-child(8),
+.card.enrolled-courses td:nth-child(8)  /* Instructor */ {
+  min-width: 200px;
+}
+
+/* Optional: striped rows for readability */
+.card.enrolled-courses tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* ===== Curriculum Table ===== */
+.card.curriculum-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  table-layout: fixed;   /* respect colgroup widths */
+}
+
+.card.curriculum-card th,
+.card.curriculum-card td {
+  border: 1px solid var(--gold);
+  padding: 8px;
+  text-align: left;
+}
+
+.card.curriculum-card th {
+  background-color: var(--dark-green);
+  color: var(--gold);
+  font-weight: bold;
+}
+
+/* Optional: striped rows */
+.card.curriculum-card tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Center checkbox styling */
+.center-checkbox {
+  text-align: center;
+}
+
+.center-checkbox input[type="checkbox"] {
+  margin: 0 auto;
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  accent-color: #007bff; /* Bootstrap blue */
+}
+
+/* Force disabled checked boxes to stay blue */
+.center-checkbox input[type="checkbox"]:disabled:checked {
+  accent-color: #007bff; /* same blue as enabled */
+  opacity: 1;            /* prevent graying out */
+}
+
+
+/* Make sure the table layout respects the colgroup */
+.card.curriculum-card table td,
+.card.curriculum-card table th {
+  word-wrap: break-word;  /* Prevent content from overflowing */
+}
+
+/* ===== Student Info Layout (/register & /edit_studentinfo) ===== */
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 40px;
+  row-gap: 8px;
   margin-bottom: 10px;
 }
 
-.card p {
-  color: var(--dark-green);
-  line-height: 1.6;
+.info-field {
+  display: grid;
+  grid-template-columns: 200px auto;
+  align-items: baseline;
 }
+
+.info-label {
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+.info-value {
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Section headings */
+.card h4 {
+  color: var(--dark-green);
+  margin: 20px 0 10px;
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 5px;
+}
+
+/* Page-specific form rules */
+.card form label {
+  display: inline-block;
+  width: 180px;
+  font-weight: bold;
+  color: var(--dark-green);
+  margin-bottom: 2px;
+  vertical-align: middle;
+}
+
+.card form input,
+.card form select {
+  width: 300px;
+  padding: 8px;
+  margin-bottom: 14px;
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  vertical-align: middle;
+}
+
+.btn-update {
+  display: block;
+  margin: 30px auto 0;
+  padding: 12px 30px;
+  width: fit-content;          /* keeps width tight to text */
+  background-color: var(--dark-green);
+  color: var(--gold);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-update:hover {
+  background-color: var(--green);
+}
+
+/* Center buttons inside forms/cards */
+.card form button,
+.card .btn-update {
+  display: block;
+  margin: 30px auto 0;
+}
+
+/* Emergency Contact tweaks */
+.card .contact-number-row label,
+.card .contact-number-row input {
+  display: block;
+  margin-left: 180px;
+}
+.card .contact-number-row label {
+  margin-left: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .info-row {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+
+  .info-field {
+    grid-template-columns: auto;
+  }
+
+  .info-label {
+    text-align: left;
+    padding-right: 0;
+  }
+}
+
+/* ===== Account Registration Form (/accountregistration) ===== */
+.registration-card {
+  background: var(--white);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 350px;
+  margin: 40px auto;
+}
+
+.registration-card h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--dark-green);
+}
+
+.registration-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.registration-card form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--dark-green);
+}
+
+.registration-card form input {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.registration-card form button {
+  padding: 12px;
+  background-color: var(--dark-green);
+  color: var(--gold);
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.registration-card form button:hover {
+  background-color: var(--green);
+}
+
+.registration-card .message {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 12px;
+}
+
+.registration-card .message a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* ===== Search Bar for Admin ===== */
+.card.student-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.card.student-list th,
+.card.student-list td {
+  border: 1px solid var(--gold);
+  padding: 10px;
+  text-align: left;
+}
+
+.card.student-list th {
+  background-color: var(--dark-green);
+  color: var(--gold);
+  font-weight: bold;
+}
+
+.card.student-list tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Center the Action column content */
+.card.student-list td:last-child {
+  text-align: center;
+}
+
+.card.student-list td:last-child form button {
+  margin: 0 auto;
+  display: block;
+}
+      .curriculum-card table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+      }
+      .curriculum-card th, .curriculum-card td {
+        word-wrap: break-word;
+        text-align: left;
+        padding: 6px;
+      }
+
+      .curriculum-card input[type="text"] {
+        width: 90%;
+        font-size: 0.9em;
+        padding: 4px;
+        margin: 0 auto;
+        display: block;
+        box-sizing: border-box;
+      }

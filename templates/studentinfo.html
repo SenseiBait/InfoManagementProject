@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Information - UNIDA CHRISTIAN COLLEGES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  
+  <script>
+    function showEditPlaceholder() {
+      alert("Edit Student Information page is not set up yet.");
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Banner -->
+<div class="school-banner">
+    <a href="{% if current_user.role == 'student' %}{{ url_for('student_portal') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}">
+        <img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo">
+    </a>
+    <h1>UNIDA CHRISTIAN COLLEGES</h1>
+    {% if current_user.is_authenticated %}
+    <div class="user-info">
+        {{ current_user.username }} | <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    {% endif %}
+</div>
+
+  <!-- Main container -->
+  <div class="main-container">
+    <div class="sidebar">
+      <h2><a href="/main" style="text-decoration:none; color:#FFD700;">UNIDA CHRISTIAN COLLEGES</a></h2>
+      <h2>Student Information</h2>
+      <ul>
+        <li><a href="/studentinfo" class="active">Student Information</a></li>
+        <li><a href="/schoolhistory">School History</a></li>
+        <li><a href="/form137">Grade History (Form 137)</a></li>
+      </ul>
+      <h2>Academic Performance</h2>
+      <ul>
+        <li><a href="/curriculum">Curriculum</a></li>
+        <li><a href="/grades">Grades</a></li>
+        <li><a href="/courses">Enrolled Courses</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <h1>Student Information</h1>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <!-- Personal Information -->
+      <div class="card student-info">
+        <h3>Personal Information</h3>
+        
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">First Name:</div>
+            <div class="info-value">{{ student_data.personal.FirstName | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Last Name:</div>
+            <div class="info-value">{{ student_data.personal.LastName | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Program:</div>
+            <div class="info-value">{{ student_data.personal.Program | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Year Level:</div>
+            <div class="info-value">
+              {% if student_data.personal.YearLevel == 1 %}1st Year
+              {% elif student_data.personal.YearLevel == 2 %}2nd Year
+              {% elif student_data.personal.YearLevel == 3 %}3rd Year
+              {% elif student_data.personal.YearLevel == 4 %}4th Year
+              {% else %}N/A{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Semester:</div>
+            <div class="info-value">
+              {% if student_data.personal.Semester == 1 %}1st Semester
+              {% elif student_data.personal.Semester == 2 %}2nd Semester
+              {% else %}N/A{% endif %}
+            </div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Birthday:</div>
+            <div class="info-value">
+              {% if student_data.personal.Birthday %}
+                {{ student_data.personal.Birthday.strftime("%B %d, %Y") }}
+              {% else %}N/A{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Age:</div>
+            <div class="info-value">{{ student_data.personal.Age | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Status:</div>
+            <div class="info-value">{{ student_data.personal.Status | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Student Number:</div>
+            <div class="info-value">{{ student_data.personal.StudentNumber | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Birthplace:</div>
+            <div class="info-value">{{ student_data.personal.Birthplace | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Sex:</div>
+            <div class="info-value">{{ student_data.personal.Sex | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Cellphone Number:</div>
+            <div class="info-value">{{ student_data.personal.CellphoneNumber | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Email:</div>
+            <div class="info-value">{{ student_data.personal.Email | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Civil Status:</div>
+            <div class="info-value">{{ student_data.personal.CivilStatus | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Nationality:</div>
+            <div class="info-value">{{ student_data.personal.Nationality | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Religion:</div>
+            <div class="info-value">{{ student_data.personal.Religion | default("N/A", true) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Information -->
+      <div class="card student-info">
+        <h3>Address Information</h3>
+        
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">House Number:</div>
+            <div class="info-value">{{ student_data.address.HouseNumber | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Street:</div>
+            <div class="info-value">{{ student_data.address.Street | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Village:</div>
+            <div class="info-value">{{ student_data.address.Village | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Barangay:</div>
+            <div class="info-value">{{ student_data.address.Barangay | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">City:</div>
+            <div class="info-value">{{ student_data.address.City | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Province:</div>
+            <div class="info-value">{{ student_data.address.Province | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Zip Code:</div>
+            <div class="info-value">{{ student_data.address.ZIPCode | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Telephone/Mobile:</div>
+            <div class="info-value">{{ student_data.address.TelephoneMobileNumber | default("N/A", true) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Contact -->
+      <div class="card student-info">
+        <h3>Emergency Contact</h3>
+        
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Contact Person:</div>
+            <div class="info-value">{{ student_data.emergency.ContactPerson | default("N/A", true) }}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">Contact Number:</div>
+            <div class="info-value">{{ student_data.emergency.ContactNumber | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Relation:</div>
+            <div class="info-value">{{ student_data.emergency.Relation | default("N/A", true) }}</div>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-field">
+            <div class="info-label">Address:</div>
+            <div class="info-value">{{ student_data.emergency.Address | default("N/A", true) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Button -->
+      <a href="{{ url_for('edit_studentinfo') }}" class="btn-update">Edit Information</a>
+
+    </div>
+  </div>
+
+</body>
+</html>

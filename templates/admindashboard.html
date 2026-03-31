@@ -10,15 +10,15 @@
   <!-- Banner -->
 <!-- Banner -->
 <div class="school-banner">
-  <a href="/"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo"></a>
-  <h1>UNIDA CHRISTIAN COLLEGES</h1>
-
-  <!-- User info on the right -->
-  {% if current_user.is_authenticated %}
-  <div class="user-info">
-    {{ current_user.email }} | <a href="{{ url_for('logout') }}">Logout</a>
-  </div>
-  {% endif %}
+    <a href="{% if current_user.role == 'student' %}{{ url_for('student_portal') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}">
+        <img src="{{ url_for('static', filename='image/logo.png') }}" alt="School Logo">
+    </a>
+    <h1>UNIDA CHRISTIAN COLLEGES</h1>
+    {% if current_user.is_authenticated %}
+    <div class="user-info">
+        {{ current_user.username }} | <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    {% endif %}
 </div>
 
   <!-- Main container (Sidebar + Content) -->
@@ -30,7 +30,7 @@
 
       <h2>Admin Options</h2>
       <ul>
-        <li><a href="/viewstudents">View Students</a></li>
+        <li><a href="/createaccount">Create Account</a></li>
         <li><a href="/viewcourses">View Courses</a></li>
       </ul>
     </div>
